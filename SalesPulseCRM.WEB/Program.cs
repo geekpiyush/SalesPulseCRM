@@ -1,35 +1,56 @@
-﻿
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using SalesPulseCRM.Infrastructure.DB;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// 🔹 Add MVC (instead of only Razor Pages)
+// MVC
 builder.Services.AddControllersWithViews();
-builder.Services.AddDbContext<CrmDbContext>(option=>
-{
-    option.UseSqlServer(builder.Configuration.GetConnectionString("Default"));
-});
-builder.Services.AddSession();
 
+// DB
+builder.Services.AddDbContext<CrmDbContext>(options =>
+{
+    options.UseSqlServer(builder.Configuration.GetConnectionString("Default"));
+});
+
+// Session (FIXED)
+builder.Services.AddSession(options =>
+{
+    options.IdleTimeout = TimeSpan.FromMinutes(30);
+    options.Cookie.HttpOnly = true;
+    options.Cookie.IsEssential = true;
+});
+
+// Auth (ADD THIS)
+builder.Services.AddAuthentication("MyCookieAuth")
+    .AddCookie("MyCookieAuth", options =>
+    {
+        options.LoginPath = "/Auth/Login";
+        options.AccessDeniedPath = "/Auth/AccessDenied";
+    });
 
 var app = builder.Build();
 
-// 🔹 Middleware
+// Error handling
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
     app.UseHsts();
 }
-app.UseSession();
-app.UseHttpsRedirection();
+
+// ⚠️ Comment for now (no SSL yet)
+// app.UseHttpsRedirection();
+
 app.UseStaticFiles();
 
 app.UseRouting();
 
+// Auth order (IMPORTANT)
+app.UseAuthentication();
 app.UseAuthorization();
 
-// 🔹 MVC Routing
+app.UseSession();
+
+// Routing
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
