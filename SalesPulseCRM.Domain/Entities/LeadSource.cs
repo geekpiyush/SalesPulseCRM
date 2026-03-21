@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace SalesPulseCRM.Infrastructure.DB;
+namespace SalesPulseCRM.Domain.Entities;
 
 public partial class LeadSource
 {

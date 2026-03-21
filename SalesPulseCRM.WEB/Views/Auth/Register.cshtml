@@ -1,0 +1,93 @@
+﻿@model RegisterDto
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Add User";
+}
+
+<link href="~/css/authcontroller/Register.css" rel="stylesheet" />
+
+<div class="container-fluid">
+    <div class="row justify-content-center">
+
+        <div class="col-12 col-md-10 col-lg-7 col-xl-6">
+
+            <div class="card-glass p-4 mt-4">
+
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h4 class="mb-0">👤 Add New User</h4>
+                    <a href="/Users" class="btn btn-sm btn-outline-light">Back</a>
+                </div>
+
+                <hr style="border-color: rgba(255,255,255,0.1);" />
+
+                <!-- SUCCESS -->
+                @if (TempData["Success"] != null)
+                {
+                    <div class="alert alert-success">@TempData["Success"]</div>
+                }
+
+                <form asp-action="Register" asp-controller="Auth" method="post">
+
+                    <!-- NAME -->
+                    <div class="mb-3">
+                        <label asp-for="Name" class="form-label text-secondary"></label>
+                        <input asp-for="Name" class="form-control" />
+                        <span asp-validation-for="Name" class="text-danger"></span>
+                    </div>
+
+                    <!-- EMAIL -->
+                    <div class="mb-3">
+                        <label asp-for="Email" class="form-label text-secondary"></label>
+                        <input asp-for="Email" class="form-control" />
+                        <span asp-validation-for="Email" class="text-danger"></span>
+                    </div>
+
+                    <!-- PHONE -->
+                    <div class="mb-3">
+                        <label asp-for="Phone" class="form-label text-secondary"></label>
+                        <input asp-for="Phone" class="form-control" />
+                    </div>
+
+                    <!-- PASSWORD -->
+                    <div class="mb-3">
+                        <label asp-for="Password" class="form-label text-secondary"></label>
+                        <input asp-for="Password" type="password" class="form-control" />
+                        <span asp-validation-for="Password" class="text-danger"></span>
+                    </div>
+
+                    <!-- ROLE -->
+                    <div class="mb-3">
+                        <label asp-for="Role" class="form-label text-secondary"></label>
+                        <select asp-for="Role" class="form-control">
+                            <option value="">Select Role</option>
+                            <option>Employee</option>
+                            <option>Manager</option>
+                            <option>Admin</option>
+                        </select>
+                        <span asp-validation-for="Role" class="text-danger"></span>
+                    </div>
+
+                    <!-- STATUS -->
+                    <div class="mb-3">
+                        <label asp-for="IsActive" class="form-label text-secondary"></label>
+                        <select asp-for="IsActive" class="form-control">
+                            <option value="true">Active</option>
+                            <option value="false">Inactive</option>
+                        </select>
+                    </div>
+
+                    <div class="d-grid mt-3">
+                        <button class="btn btn-primary">Create User</button>
+                    </div>
+
+                </form>
+
+            </div>
+
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

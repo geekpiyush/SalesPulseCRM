@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace SalesPulseCRM.Infrastructure.DB;
-
+namespace SalesPulseCRM.Domain.Entities;
 public partial class User
 {
     public int UserId { get; set; }

@@ -1,51 +1,179 @@
-﻿<!DOCTYPE html>
+﻿@{
+    var userName = Context.Session.GetString("UserName") ?? "User";
+}
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - SalesPulseCRM.WEB</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>@ViewData["Title"] - CRM</title>
+
+    <!-- Bootstrap -->
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
-    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/SalesPulseCRM.WEB.styles.css" asp-append-version="true" />
+    <link href="~/css/homecontroller/dashboard/Dashboard.css" rel="stylesheet" />
+    <!-- Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+
+    <!-- Google Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+
 </head>
+
 <body>
-    <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
-            <div class="container">
-                <a class="navbar-brand" asp-area="" asp-page="/Index">SalesPulseCRM.WEB</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
+
+    <!-- SIDEBAR -->
+    <div class="sidebar" id="sidebar">
+        <h4 class="logo-text">🚀 CRM</h4>
+
+        <a href="/Home/Dashboard" class="active">
+            <i class="bi bi-speedometer2"></i>
+            <span class="menu-text">Dashboard</span>
+        </a>
+
+        <a href="/Lead">
+            <i class="bi bi-people-fill"></i>
+            <span class="menu-text">Leads</span>
+        </a>
+
+        <a href="/FollowUp">
+            <i class="bi bi-calendar2-check"></i>
+            <span class="menu-text">Follow-ups</span>
+        </a>
+
+        <a href="/Users">
+            <i class="bi bi-person-badge"></i>
+            <span class="menu-text">Users</span>
+        </a>
+
+        <a href="/Reports">
+            <i class="bi bi-bar-chart-line"></i>
+            <span class="menu-text">Reports</span>
+        </a>
+
+        <a href="/Settings">
+            <i class="bi bi-gear-fill"></i>
+            <span class="menu-text">Settings</span>
+        </a>
+    </div>
+    <div id="overlay"></div>
+
+    <!-- MAIN -->
+    <div class="main">
+
+        <!-- TOPBAR -->
+        <div class="topbar d-flex justify-content-between align-items-center mb-4 px-3 py-2">
+
+            <!-- LEFT -->
+            <div class="d-flex align-items-center gap-3">
+
+                <button class="menu-btn" onclick="toggleSidebar()">
+                    <i class="bi bi-list"></i>
                 </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-page="/Index">Home</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-page="/Privacy">Privacy</a>
-                        </li>
-                    </ul>
+
+                <div>
+                    <h6 class="mb-0 text-secondary">SalesPulseCRM</h6>
+                    <h5 class="mb-0 fw-semibold">Dashboard</h5>
                 </div>
+
             </div>
-        </nav>
-    </header>
-    <div class="container">
-        <main role="main" class="pb-3">
+
+            <!-- RIGHT -->
+            <div class="d-flex align-items-center gap-3">
+
+                <!-- Notification -->
+                <div class="icon-btn position-relative">
+                    <i class="bi bi-bell"></i>
+                    <span class="badge-dot"></span>
+                </div>
+
+                <!-- User -->
+                <div class="user-dropdown">
+
+                    <div class="user-trigger d-flex align-items-center gap-2">
+                        <div class="avatar">@userName.Substring(0,1)</div>
+                        <span>@userName</span>
+                        <i class="bi bi-chevron-down"></i>
+                    </div>
+
+                    <div class="dropdown-menu-custom">
+                        <a asp-action="Register" asp-controller="Auth">
+                            <i class="bi bi-person-plus"></i> Add User
+                        </a>
+
+                        <a href="#">
+                            <i class="bi bi-person"></i> Profile
+                        </a>
+
+                        <a href="/Auth/Logout">
+                            <i class="bi bi-box-arrow-right"></i> Logout
+                        </a>
+                    </div>
+
+                </div>
+              
+               
+
+            </div>
+
+        </div>
+
+        <!-- CONTENT -->
+        <div>
             @RenderBody()
-        </main>
+        </div>
+
     </div>
 
-    <footer class="border-top footer text-muted">
-        <div class="container">
-            &copy; 2026 - SalesPulseCRM.WEB - <a asp-area="" asp-page="/Privacy">Privacy</a>
-        </div>
-    </footer>
 
-    <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="~/js/site.js" asp-append-version="true"></script>
+
+    <script>
+        const sidebar = document.getElementById("sidebar");
+        const overlay = document.getElementById("overlay");
+        const main = document.querySelector(".main");
+
+        function toggleSidebar() {
+            if (window.innerWidth <= 768) {
+                sidebar.classList.toggle("active");
+                overlay.classList.toggle("active");
+            } else {
+                sidebar.classList.toggle("collapsed");
+                main.classList.toggle("collapsed");
+            }
+        }
+
+        // 🔥 CLOSE on overlay click
+        overlay.addEventListener("click", () => {
+            sidebar.classList.remove("active");
+            overlay.classList.remove("active");
+        });
+
+        // 🔥 CLOSE on menu click (mobile UX)
+        document.querySelectorAll(".sidebar a").forEach(link => {
+            link.addEventListener("click", () => {
+                if (window.innerWidth <= 768) {
+                    sidebar.classList.remove("active");
+                    overlay.classList.remove("active");
+                }
+            });
+        });
+             const userDropdown = document.querySelector(".user-dropdown");
+        const trigger = document.querySelector(".user-trigger");
+        const menu = document.querySelector(".dropdown-menu-custom");
+
+        trigger.addEventListener("click", () => {
+            menu.style.display = menu.style.display === "block" ? "none" : "block";
+        });
+
+        // Close on outside click
+        document.addEventListener("click", (e) => {
+            if (!userDropdown.contains(e.target)) {
+                menu.style.display = "none";
+            }
+        });
+    </script>
 
     @await RenderSectionAsync("Scripts", required: false)
+
 </body>
 </html>

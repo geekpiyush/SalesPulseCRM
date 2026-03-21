@@ -1,0 +1,34 @@
+﻿.form-control {
+    background: rgba(255,255,255,0.06);
+    border: none;
+    color: white;
+    border-radius: 10px;
+}
+
+    .form-control:focus {
+        background: rgba(255,255,255,0.1);
+        box-shadow: none;
+        color: white;
+    }
+
+.form-label {
+    font-size: 13px;
+}
+/* SELECT DARK FIX */
+select.form-control {
+    appearance: none;
+    background-image: url("data:image/svg+xml;utf8,<svg fill='white' height='20' viewBox='0 0 20 20' width='20'><path d='M5 7l5 5 5-5H5z'/></svg>");
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+}
+
+    /* OPTIONS FIX (important) */
+    select.form-control option {
+        background: #020617;
+        color: white;
+    }
+    select.form-control:focus {
+        background: rgba(255,255,255,0.1);
+        box-shadow: none;
+        color: white;
+    }

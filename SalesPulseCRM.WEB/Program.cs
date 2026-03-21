@@ -10,6 +10,9 @@ builder.Services.AddDbContext<CrmDbContext>(option=>
 {
     option.UseSqlServer(builder.Configuration.GetConnectionString("Default"));
 });
+builder.Services.AddSession();
+
+
 var app = builder.Build();
 
 // 🔹 Middleware
@@ -18,7 +21,7 @@ if (!app.Environment.IsDevelopment())
     app.UseExceptionHandler("/Home/Error");
     app.UseHsts();
 }
-
+app.UseSession();
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 

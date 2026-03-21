@@ -1,0 +1,63 @@
+﻿@model SalesPulseCRM.Application.DTOs.LoginDto
+
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="~/css/loginlayout/loginLayout.css" rel="stylesheet" />
+</head>
+
+<body>
+
+    <div class="auth-container">
+
+        <!-- LEFT -->
+        <div class="auth-left">
+            <h1>🚀 SalesPulse CRM</h1>
+            <p>Manage leads, follow-ups and grow your business efficiently.</p>
+        </div>
+
+        <!-- RIGHT -->
+        <div class="auth-right">
+
+            <div class="auth-card">
+
+                <h4 class="text-center mb-3">Welcome Back</h4>
+
+                <form asp-action="Login" asp-controller="Auth" method="post">
+
+                    <!-- EMAIL -->
+                    <div class="mb-3">
+                        <input asp-for="Email" class="form-control" placeholder="Email" />
+                        <span asp-validation-for="Email" class="text-danger"></span>
+                    </div>
+
+                    <!-- PASSWORD -->
+                    <div class="mb-3">
+                        <input asp-for="Password" type="password" class="form-control" placeholder="Password" />
+                        <span asp-validation-for="Password" class="text-danger"></span>
+                    </div>
+
+                    <button class="btn btn-login w-100">Login</button>
+
+                </form>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    @section Scripts {
+        <partial name="_ValidationScriptsPartial" />
+    }
+
+</body>
+</html>
