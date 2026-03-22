@@ -27,7 +27,7 @@
     <div class="sidebar" id="sidebar">
         <h4 class="logo-text">🚀CRM</h4>
 
-        <a href="/Home/Dashboard" class="active">
+        <a asp-action="Index" asp-controller="Home" class="active">
             <i class="bi bi-speedometer2"></i>
             <span class="menu-text">Dashboard</span>
         </a>
@@ -106,7 +106,7 @@
                             <i class="bi bi-person"></i> Profile
                         </a>
 
-                        <a href="/Auth/Logout">
+                        <a asp-action="Logout" asp-controller="Auth">
                             <i class="bi bi-box-arrow-right"></i> Logout
                         </a>
                     </div>

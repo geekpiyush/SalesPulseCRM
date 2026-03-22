@@ -90,5 +90,13 @@ namespace SalesPulseCRM.WEB.Controllers
             TempData["Success"] = "User Created Successfully";
             return RedirectToAction("Register");
         }
+
+        
+        public IActionResult Logout()
+        {
+            HttpContext.Session.Clear();
+
+            return RedirectToAction("Login", "Auth");
+        }
     }
 }
