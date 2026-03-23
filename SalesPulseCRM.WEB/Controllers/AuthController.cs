@@ -130,6 +130,11 @@ namespace SalesPulseCRM.WEB.Controllers
 
             return View();
         }
+        [HttpGet]
+        public IActionResult ResetPassword()
+        {
+            return View();
+        }
 
         [HttpPost]
         public IActionResult ResetPassword(string token, string newPassword)
