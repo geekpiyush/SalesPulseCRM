@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using SalesPulseCRM.Application.Services;
 using SalesPulseCRM.Infrastructure.DB;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -27,6 +28,8 @@ builder.Services.AddAuthentication("MyCookieAuth")
         options.LoginPath = "/Auth/Login";
         options.AccessDeniedPath = "/Auth/AccessDenied";
     });
+
+builder.Services.AddScoped<EmailServices>();
 
 var app = builder.Build();
 

@@ -27,4 +27,6 @@ public partial class User
     public virtual ICollection<User> InverseManager { get; set; } = new List<User>();
 
     public virtual User? Manager { get; set; }
+    public string? ResetToken { get; set; }
+    public DateTime? ResetTokenExpiry { get; set; }
 }

@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using SalesPulseCRM.Application.DTOs;
 using SalesPulseCRM.Application.Helpers;
+using SalesPulseCRM.Application.Services;
 using SalesPulseCRM.Domain.Entities;
 using SalesPulseCRM.Infrastructure.DB;
 
@@ -10,9 +11,11 @@ namespace SalesPulseCRM.WEB.Controllers
     public class AuthController : Controller
     {
         private readonly CrmDbContext _db;
-        public AuthController(CrmDbContext crmDbContext)
+        private readonly EmailServices _emailServices;
+        public AuthController(CrmDbContext crmDbContext, EmailServices emailServices)
         {
             _db = crmDbContext;
+            _emailServices = emailServices;
         }
 
         [HttpGet]
@@ -96,6 +99,51 @@ namespace SalesPulseCRM.WEB.Controllers
         {
             HttpContext.Session.Clear();
 
+            return RedirectToAction("Login", "Auth");
+        }
+
+        [HttpGet]
+        public IActionResult ForgotPassword()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        public IActionResult ForgotPassword(string email)
+        {
+          var user =  _db.Users.FirstOrDefault(x => x.Email == email);
+            if(user == null)
+            {
+                TempData["Msg"] = "If email exist, resent link sent";
+                return View();
+            }
+            user.ResetToken = Guid.NewGuid().ToString();
+            user.ResetTokenExpiry = DateTime.Now.AddMinutes(2);
+
+            _db.SaveChanges();
+
+            var link = $"http://31.97.60.7:5000/Auth/ResetPassword?token={user.ResetToken}";
+
+           
+            _emailServices.SendEmail(email, link);
+            //SendEmail(user.Email, link);
+
+            return View();
+        }
+
+        [HttpPost]
+        public IActionResult ResetPassword(string token, string newPassword)
+        {
+            var user = _db.Users.FirstOrDefault(temp => temp.ResetToken == token);
+
+            if(user == null || user.ResetTokenExpiry < DateTime.Now)
+            {
+                return Content("Invalid or expired link");
+            }
+            user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(newPassword); 
+            user.ResetToken = null;
+            user.ResetTokenExpiry = null;
+            _db.SaveChanges();
             return RedirectToAction("Login", "Auth");
         }
     }
