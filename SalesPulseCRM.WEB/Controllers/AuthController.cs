@@ -41,13 +41,15 @@ namespace SalesPulseCRM.WEB.Controllers
                 return View(loginDto);
             }
 
-            var hash = BCrypt.Net.BCrypt.HashPassword(loginDto.Password);
+            //var hash = BCrypt.Net.BCrypt.HashPassword(loginDto.Password);
+            bool isValid =  BCrypt.Net.BCrypt.Verify(loginDto.Password, user.PasswordHash);
 
-            if(user.PasswordHash != hash)
+            if(!isValid)
             {
                 ModelState.AddModelError("Password", "Invalid Password");
                 return View(loginDto);
             }
+
             HttpContext.Session.SetString("UserName", user.Name);
             return RedirectToAction("Index","Home");
         }
