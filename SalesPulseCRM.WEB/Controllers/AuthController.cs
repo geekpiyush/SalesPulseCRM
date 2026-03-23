@@ -19,25 +19,51 @@ namespace SalesPulseCRM.WEB.Controllers
             _emailServices = emailServices;
         }
 
+
+        private void GenerateCaptcha()
+        {
+            var rand = new Random();
+            int num1 = rand.Next(1, 100);
+            int num2 = rand.Next(1, 100);
+
+            HttpContext.Session.SetInt32("CaptchaAnswer", num1 + num2);
+            ViewBag.CaptchaQuestion = $"{num1} + {num2} = ?";
+        }
+
         [HttpGet]
         public IActionResult Login()
         {
+           GenerateCaptcha();
             return View();
         }
 
         [HttpPost]
-        public async Task<IActionResult> Login(LoginDto loginDto)
+        public async Task<IActionResult> Login(LoginDto loginDto, int captcha)
         {
             if(!ModelState.IsValid)
             {
+
                 return View(loginDto);
             }
+
+            var expected = HttpContext.Session.GetInt32("CaptchaAnswer");
+
+
+            if (expected == null || captcha != expected)
+            {
+                ModelState.AddModelError("", "Captcha incorrect");
+                GenerateCaptcha();
+
+                return View(loginDto);
+            }
+
             //find user using email 
-          var user =  await _db.Users.FirstOrDefaultAsync(temp => temp.Email == loginDto.Email);
+            var user =  await _db.Users.FirstOrDefaultAsync(temp => temp.Email == loginDto.Email);
 
             if(user == null)
             {
                 ModelState.AddModelError("Email", "User Not Found");
+                GenerateCaptcha();
                 return View(loginDto);
             }
 
@@ -47,6 +73,7 @@ namespace SalesPulseCRM.WEB.Controllers
             if(!isValid)
             {
                 ModelState.AddModelError("Password", "Invalid Password");
+                GenerateCaptcha();
                 return View(loginDto);
             }
 

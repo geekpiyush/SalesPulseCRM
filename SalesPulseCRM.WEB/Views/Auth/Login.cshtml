@@ -28,7 +28,6 @@
 
             <div class="logo">🚀 SalesPulse</div>
             <div class="subtitle">Login to manage your CRM</div>
-
             <form asp-action="Login" asp-controller="Auth" method="post">
 
                 <!-- EMAIL -->
@@ -38,26 +37,64 @@
                 </div>
 
                 <!-- PASSWORD -->
-                <div class="mb-3">
-                    <input asp-for="Password" type="password" class="form-control" placeholder="Password" />
+                <div class="mb-3 position-relative">
+                    <input asp-for="Password" type="password" class="form-control pe-5"
+                           placeholder="Password" id="passwordField" />
+
+                    <i class="bi bi-eye-slash position-absolute top-50 end-0 translate-middle-y me-3"
+                       id="togglePassword" style="cursor:pointer;"></i>
+
                     <span asp-validation-for="Password" class="text-danger"></span>
+                </div>
+
+                <!-- CAPTCHA (FIXED) -->
+                <div class="mb-3">
+
+                    <div class="captcha-mobile-card">
+
+                        <!-- Top Row -->
+                        <div class="captcha-top">
+                            <span>🔐 Verify</span>
+                            <button type="button" onclick="location.reload()">
+                                <i class="bi bi-arrow-repeat"></i>
+                            </button>
+                        </div>
+
+                        <!-- Question -->
+                        <div class="captcha-question-mobile">
+                            @ViewBag.CaptchaQuestion
+                        </div>
+
+                        <!-- Input -->
+                        <input name="captcha" class="form-control captcha-input-mobile" placeholder="Enter answer" required />
+                        <span class="text-danger small mt-1 d-block">
+                            @ViewBag.CaptchaError
+                        </span>
+                    </div>
+
                 </div>
 
                 <!-- BUTTON -->
                 <button class="btn btn-login w-100">Login</button>
 
-                <!-- LINKS -->
-             @*    <div class="extra-links">
-                    <a asp-action="ForgotPassword" asp-controller="Auth">Forgot Password?</a>
-                </div> *@
-
             </form>
-
         </div>
 
     </div>
 
     <partial name="_ValidationScriptsPartial" />
 
+    <script>
+        const toggle = document.getElementById("togglePassword");
+        const password = document.getElementById("passwordField");
+
+        toggle.addEventListener("click", () => {
+            const type = password.getAttribute("type") === "password" ? "text" : "password";
+            password.setAttribute("type", type);
+
+            toggle.classList.toggle("bi-eye");
+            toggle.classList.toggle("bi-eye-slash");
+        });
+    </script>
 </body>
 </html>
