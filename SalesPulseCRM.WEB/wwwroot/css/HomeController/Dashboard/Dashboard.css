@@ -259,3 +259,35 @@ body {
             background: #2563eb;
             color: white;
         }
+/* MENU GROUP */
+.menu-group {
+    margin: 6px 10px;
+}
+
+/* SUBMENU */
+.submenu {
+    display: none;
+    flex-direction: column;
+    margin-left: 30px;
+}
+
+    .submenu a {
+        padding: 10px;
+        font-size: 14px;
+        color: #94a3b8;
+        border-radius: 8px;
+    }
+
+        .submenu a:hover {
+            background: #2563eb;
+            color: white;
+        }
+
+/* OPEN STATE */
+.menu-group.open .submenu {
+    display: flex;
+}
+.menu-group.open .bi-chevron-down {
+    transform: rotate(180deg);
+    transition: 0.3s;
+}
