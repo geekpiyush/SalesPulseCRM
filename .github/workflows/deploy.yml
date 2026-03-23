@@ -28,7 +28,8 @@ jobs:
         username: ${{ secrets.VPS_USER }}
         key: ${{ secrets.VPS_SSH_KEY }}
         source: "publish/*"
-        target: "/var/www/SalesPulseCRM"
+        target: "/var/www/SalesPulseCRM/"
+        strip_components: 1
 
     - name: Restart App
       uses: appleboy/ssh-action@v1.0.0

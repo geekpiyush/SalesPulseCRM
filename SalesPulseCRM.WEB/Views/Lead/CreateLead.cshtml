@@ -1,0 +1,110 @@
+﻿@using SalesPulseCRM.Application.DTOs
+@model CreateLeadDto
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Create Lead";
+}
+
+<link href="~/css/AuthController/Register.css" rel="stylesheet" />
+
+<div class="container-fluid">
+    <div class="row justify-content-center">
+
+        <div class="col-12 col-md-10 col-lg-7 col-xl-6">
+
+            <div class="card-glass p-4 mt-4">
+
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h4 class="mb-0">👤 Create Lead</h4>
+                    <a href="/Users" class="btn btn-sm btn-outline-light">Back</a>
+                </div>
+
+                <hr style="border-color: rgba(255,255,255,0.1);" />
+
+                <!-- SUCCESS -->
+                @if (TempData["Success"] != null)
+                {
+                    <div class="alert alert-success">@TempData["Success"]</div>
+                }
+
+                <form asp-action="CreateLead" asp-controller="Lead" method="post">
+
+                    <!-- NAME -->
+                    <div class="mb-3">
+                        <label asp-for="CustomerName" class="form-label text-secondary"></label>
+                        <input asp-for="CustomerName" class="form-control" />
+                        <span asp-validation-for="CustomerName" class="text-danger"></span>
+                    </div>
+
+                    <!-- EMAIL -->
+                    <div class="mb-3">
+                        <label asp-for="Email" class="form-label text-secondary"></label>
+                        <input asp-for="Email" class="form-control" />
+                        <span asp-validation-for="Email" class="text-danger"></span>
+                    </div>
+
+                    <!-- PHONE -->
+                    <div class="mb-3">
+                        <label asp-for="Phone" class="form-label text-secondary"></label>
+                        <input asp-for="Phone" class="form-control" />
+                    </div>
+
+               @*      <!-- PASSWORD -->
+                    <div class="mb-3">
+                        <label asp-for="Password" class="form-label text-secondary"></label>
+                        <input asp-for="Password" type="password" class="form-control" />
+                        <span asp-validation-for="Password" class="text-danger"></span>
+                    </div> *@
+
+                    <!-- ROLE -->
+                    <div class="mb-3">
+                        <label asp-for="LeadSource" class="form-label text-secondary"></label>
+                        <select asp-for="LeadSource" class="form-control">
+                            <option value="">Select Source</option>
+                            <option>Meta</option>
+                            <option>PPC</option>
+                            <option>Customer</option>
+                        </select>
+                        <span asp-validation-for="LeadSource" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="LeadStatus" class="form-label text-secondary"></label>
+                        <select asp-for="LeadStatus" class="form-control">
+                            <option value="">Lead Status</option>
+                            <option>New</option>
+                            <option>Hot</option>
+                            <option>Cold</option>
+                            <option>Warm</option>
+                        </select>
+                        <span asp-validation-for="LeadStatus" class="text-danger"></span>
+                    </div>
+
+                    @* <div class="mb-3">
+                        <label asp-for="AssignedTo" class="form-label text-secondary"></label>
+                        <input asp-for="AssignedTo" class="form-control" />
+                    </div> *@
+                    <!-- STATUS -->
+                    @* <div class="mb-3">
+                        <label asp-for="IsActive" class="form-label text-secondary"></label>
+                        <select asp-for="IsActive" class="form-control">
+                            <option value="true">Active</option>
+                            <option value="false">Inactive</option>
+                        </select>
+                    </div> *@
+
+                    <div class="d-grid mt-3">
+                        <button class="btn btn-primary">Create Lead</button>
+                    </div>
+
+                </form>
+
+            </div>
+
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
