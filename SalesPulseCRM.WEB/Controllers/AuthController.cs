@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using BCrypt.Net;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SalesPulseCRM.Application.DTOs;
 using SalesPulseCRM.Application.Helpers;
@@ -40,7 +41,7 @@ namespace SalesPulseCRM.WEB.Controllers
                 return View(loginDto);
             }
 
-            var hash = PasswordHashHelper.Hash(loginDto.Password);
+            var hash = BCrypt.Net.BCrypt.HashPassword(loginDto.Password);
 
             if(user.PasswordHash != hash)
             {
@@ -80,7 +81,7 @@ namespace SalesPulseCRM.WEB.Controllers
                 Name = registerDto.Name,
                 Email = registerDto.Email,
                 Phone = registerDto.Phone,
-                PasswordHash = PasswordHashHelper.Hash(registerDto.Password),
+                PasswordHash = BCrypt.Net.BCrypt.HashPassword(registerDto.Password),
                 Role = registerDto.Role,
                 IsActive = registerDto.IsActive,
                 CreatedDate = DateTime.Now,
