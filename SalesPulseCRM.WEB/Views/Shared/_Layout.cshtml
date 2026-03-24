@@ -33,7 +33,7 @@
         </a>
 
         <div class="menu-group">
-            <a href="javascript:void(0)" class="menu-toggle">
+            <a class="menu-toggle">
                 <i class="bi bi-people-fill"></i>
                 <span class="menu-text">Leads</span>
                 <i class="bi bi-chevron-down ms-auto"></i>
@@ -280,7 +280,7 @@
         });
 
         // 🔥 CLOSE on menu click (mobile UX)
-               document.querySelectorAll(".sidebar a").forEach(link => {
+               document.querySelectorAll(".sidebar a:not(.menu-toggle)").forEach(link => {
             link.addEventListener("click", () => {
                 if (window.innerWidth <= 768) {
                     sidebar.classList.remove("active");
@@ -304,8 +304,9 @@
         });
 
                 // Leads dropdown toggle
-        document.querySelectorAll(".menu-toggle").forEach(toggle => {
-            toggle.addEventListener("click", () => {
+            document.querySelectorAll(".menu-toggle").forEach(toggle => {
+            toggle.addEventListener("click", (e) => {
+                e.preventDefault();   // 🔥 important
                 const parent = toggle.parentElement;
                 parent.classList.toggle("open");
             });

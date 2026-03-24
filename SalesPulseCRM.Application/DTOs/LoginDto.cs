@@ -15,5 +15,6 @@ namespace SalesPulseCRM.Application.DTOs
 
         [Required(ErrorMessage = "Password is required")]
         public string Password { get; set; }
+        public int Captcha { get; set; }
     }
 }

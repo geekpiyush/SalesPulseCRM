@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Hangfire;
+using Microsoft.EntityFrameworkCore;
 using SalesPulseCRM.Application.Services;
 using SalesPulseCRM.Infrastructure.DB;
 
@@ -12,6 +13,13 @@ builder.Services.AddDbContext<CrmDbContext>(options =>
 {
     options.UseSqlServer(builder.Configuration.GetConnectionString("Default"));
 });
+
+builder.Services.AddHangfire(config =>
+    {
+        config.UseSqlServerStorage(builder.Configuration.GetConnectionString("Default"));
+    });
+
+builder.Services.AddHangfireServer();
 
 // Session (FIXED)
 builder.Services.AddSession(options =>
@@ -30,6 +38,7 @@ builder.Services.AddAuthentication("MyCookieAuth")
     });
 
 builder.Services.AddScoped<EmailServices>();
+
 
 var app = builder.Build();
 
@@ -52,6 +61,7 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.UseSession();
+app.UseHangfireDashboard();
 
 // Routing
 app.MapControllerRoute(

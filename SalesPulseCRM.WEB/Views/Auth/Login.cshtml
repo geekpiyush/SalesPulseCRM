@@ -28,6 +28,13 @@
 
             <div class="logo">🚀 SalesPulse</div>
             <div class="subtitle">Login to manage your CRM</div>
+            @if (!ViewData.ModelState.IsValid)
+            {
+                <div class="alert alert-danger text-center rounded-3 mb-3"
+                     style="background:#ef44441a;color:#ef4444;border:none;">
+                    @Html.ValidationSummary(false)
+                </div>
+            }
             <form asp-action="Login" asp-controller="Auth" method="post">
 
                 <!-- EMAIL -->
@@ -66,10 +73,9 @@
                         </div>
 
                         <!-- Input -->
-                        <input name="captcha" class="form-control captcha-input-mobile" placeholder="Enter answer" required />
-                        <span class="text-danger small mt-1 d-block">
-                            @ViewBag.CaptchaError
-                        </span>
+                        <input asp-for="Captcha" class="form-control captcha-input-mobile" placeholder="Enter answer" />
+
+                        <span asp-validation-for="Captcha" class="text-danger small"></span>
                     </div>
 
                 </div>

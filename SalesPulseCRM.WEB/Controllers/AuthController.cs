@@ -1,4 +1,5 @@
 ﻿using BCrypt.Net;
+using Hangfire;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SalesPulseCRM.Application.DTOs;
@@ -49,9 +50,9 @@ namespace SalesPulseCRM.WEB.Controllers
             var expected = HttpContext.Session.GetInt32("CaptchaAnswer");
 
 
-            if (expected == null || captcha != expected)
+            if (expected == null || loginDto.Captcha != expected)
             {
-                ModelState.AddModelError("", "Captcha incorrect");
+                ModelState.AddModelError("Captcha", "Captcha incorrect");
                 GenerateCaptcha();
 
                 return View(loginDto);
@@ -80,7 +81,7 @@ namespace SalesPulseCRM.WEB.Controllers
 
             if(!user.IsActive)
             {
-                ModelState.AddModelError("", "Please verify your email first.");
+                ModelState.AddModelError("", "⚠️ Please verify your email before login.");
                 return View(loginDto);
             }
 
@@ -138,7 +139,7 @@ namespace SalesPulseCRM.WEB.Controllers
             new { email = user.Email, token = user.EmailVerificationToken},
             Request.Scheme);
 
-            _emailServices.SendVerificationEmail(user.Email, verifyLink);
+            BackgroundJob.Enqueue(() => _emailServices.SendVerificationEmail(user.Email, verifyLink));
 
             TempData["Success"] = "User Created Successfully";
             return RedirectToAction("Register");
@@ -166,7 +167,8 @@ namespace SalesPulseCRM.WEB.Controllers
             user.TokenExpiry = null; 
             await _db.SaveChangesAsync();
 
-            return Content("Email verified successfully. You can login now.");
+            TempData["Success"] = "Email verified successfully. You can login now.";
+            return RedirectToAction("Login", "Auth");
         }
 
 
@@ -199,10 +201,8 @@ namespace SalesPulseCRM.WEB.Controllers
 
             var link = $"http://31.97.60.7:5000/Auth/ResetPassword?token={user.ResetToken}";
 
-           
-            _emailServices.SendEmail(email, link);
             //SendEmail(user.Email, link);
-
+            BackgroundJob.Enqueue(() => _emailServices.SendEmail(email, link));
             return View();
         }
         [HttpGet]
