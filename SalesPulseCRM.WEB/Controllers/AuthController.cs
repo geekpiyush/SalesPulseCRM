@@ -130,12 +130,12 @@ namespace SalesPulseCRM.WEB.Controllers
 
             var verifyToken = Guid.NewGuid().ToString();
             user.EmailVerificationToken = verifyToken;
-            user.TokenExpiry = DateTime.Now.AddMinutes(30);
+            user.TokenExpiry = DateTime.UtcNow.AddMinutes(30);
 
             await _db.SaveChangesAsync();
 
             var verifyLink = Url.Action("VerifyEmail", "Auth",
-            new { email = user.Email, token = user.TokenExpiry},
+            new { email = user.Email, token = user.EmailVerificationToken},
             Request.Scheme);
 
             _emailServices.SendVerificationEmail(user.Email, verifyLink);
