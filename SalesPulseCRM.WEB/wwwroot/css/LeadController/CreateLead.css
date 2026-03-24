@@ -1,0 +1,95 @@
+﻿.custom-input {
+    height: 54px;
+    font-size: 15px;
+    border-radius: 12px;
+    border: 1px solid #e4e7ec;
+    transition: all 0.2s ease;
+}
+
+    .custom-input:focus {
+        border-color: #4f46e5;
+        box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+    }
+
+/* Floating label fix */
+.form-floating > label {
+    font-size: 13px;
+    color: #6c757d;
+}
+
+/* Button */
+.custom-btn {
+    height: 50px;
+    border-radius: 12px;
+    font-weight: 500;
+}
+
+/* Sticky Mobile Button */
+.mobile-submit {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: #fff;
+    padding: 10px;
+    border-top: 1px solid #ddd;
+}
+
+/* Prevent zoom on mobile */
+@media (max-width: 768px) {
+    .custom-input {
+        font-size: 16px;
+        height: 50px;
+    }
+}
+.custom-input {
+    height: 54px;
+    border-radius: 12px;
+    border: 1px solid #e4e7ec;
+    transition: 0.2s;
+}
+
+    .custom-input:focus {
+        border-color: #4f46e5;
+        box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+    }
+
+.custom-btn {
+    height: 50px;
+    border-radius: 12px;
+}
+
+/* Import box */
+.import-box {
+    border: 2px dashed #d0d5dd;
+    border-radius: 12px;
+    background: #fafafa;
+}
+.import-wrapper {
+    border: 1.5px dashed rgba(255,255,255,0.2);
+    border-radius: 14px;
+    padding: 40px 20px;
+    background: rgba(255,255,255,0.02);
+    transition: all 0.2s ease;
+}
+
+    .import-wrapper:hover {
+        border-color: #4f46e5;
+        background: rgba(79, 70, 229, 0.05);
+    }
+
+.upload-icon {
+    font-size: 32px;
+}
+
+#importSection h6 {
+    font-size: 16px;
+}
+
+#importSection p {
+    font-size: 13px;
+}
+
+#fileName {
+    font-weight: 500;
+}

@@ -3,143 +3,149 @@ using SalesPulseCRM.Domain.Entities;
 
 namespace SalesPulseCRM.Infrastructure.DB;
 
-public partial class CrmDbContext : DbContext
+public class CrmDbContext : DbContext
 {
-    public CrmDbContext()
-    {
-    }
-
     public CrmDbContext(DbContextOptions<CrmDbContext> options)
         : base(options)
     {
     }
 
-    public  DbSet<EmailQueue> EmailQueues { get; set; }
-
-    public  DbSet<Followup> Followups { get; set; }
-
-    public  DbSet<Lead> Leads { get; set; }
-
-    public  DbSet<LeadAssignment> LeadAssignments { get; set; }
-
-    public  DbSet<LeadNote> LeadNotes { get; set; }
-
-    public  DbSet<LeadSource> LeadSources { get; set; }
-
-    public  DbSet<Notification> Notifications { get; set; }
-
-    public  DbSet<User> Users { get; set; }
+    public DbSet<Lead> Leads { get; set; }
+    public DbSet<LeadSource> LeadSources { get; set; }
+    public DbSet<LeadStatus> LeadStatuses { get; set; }
+    public DbSet<LeadAssignment> LeadAssignments { get; set; }
+    public DbSet<LeadNote> LeadNotes { get; set; }
+    public DbSet<Followup> Followups { get; set; }
+    public DbSet<Notification> Notifications { get; set; }
+    public DbSet<EmailQueue> EmailQueues { get; set; }
+    public DbSet<User> Users { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.Entity<EmailQueue>(entity =>
-        {
-            entity.HasKey(e => e.EmailId).HasName("PK__EmailQue__7ED91ACFCB1B7CCA");
-
-            entity.ToTable("EmailQueue");
-
-            entity.Property(e => e.CreatedDate)
-                .HasDefaultValueSql("(getdate())")
-                .HasColumnType("datetime");
-            entity.Property(e => e.Email).HasMaxLength(150);
-            entity.Property(e => e.SentDate).HasColumnType("datetime");
-            entity.Property(e => e.Status)
-                .HasMaxLength(50)
-                .HasDefaultValue("Pending");
-            entity.Property(e => e.Subject).HasMaxLength(200);
-        });
-
-        modelBuilder.Entity<Followup>(entity =>
-        {
-            entity.HasKey(e => e.FollowupId).HasName("PK__Followup__C6356211AA32AFFB");
-
-            entity.Property(e => e.FollowupDateTime).HasColumnType("datetime");
-            entity.Property(e => e.Remarks).HasMaxLength(500);
-            entity.Property(e => e.Status)
-                .HasMaxLength(50)
-                .HasDefaultValue("Pending");
-        });
-
+        // 🔹 LEADS
         modelBuilder.Entity<Lead>(entity =>
         {
-            entity.HasKey(e => e.LeadId).HasName("PK__Leads__73EF78FA1006D952");
+            entity.HasKey(e => e.LeadId);
 
-            entity.Property(e => e.CreatedDate)
-                .HasDefaultValueSql("(getdate())")
-                .HasColumnType("datetime");
-            entity.Property(e => e.CustomerName).HasMaxLength(150);
+            entity.Property(e => e.CustomerName).HasMaxLength(150).IsRequired();
+            entity.Property(e => e.Phone).HasMaxLength(20).IsRequired();
             entity.Property(e => e.Email).HasMaxLength(150);
-            entity.Property(e => e.LastUpdatedDate).HasColumnType("datetime");
-            entity.Property(e => e.LeadStatus)
-                .HasMaxLength(50)
-                .HasDefaultValue("New");
-            entity.Property(e => e.Phone).HasMaxLength(20);
-        });
-
-        modelBuilder.Entity<LeadAssignment>(entity =>
-        {
-            entity.HasKey(e => e.AssignmentId).HasName("PK__LeadAssi__32499E77D4086639");
-
-            entity.Property(e => e.AssignedDate)
-                .HasDefaultValueSql("(getdate())")
-                .HasColumnType("datetime");
-        });
-
-        modelBuilder.Entity<LeadNote>(entity =>
-        {
-            entity.HasKey(e => e.NoteId).HasName("PK__LeadNote__EACE355FF84941D2");
 
             entity.Property(e => e.CreatedDate)
-                .HasDefaultValueSql("(getdate())")
-                .HasColumnType("datetime");
+                .HasDefaultValueSql("GETDATE()");
+
+            entity.Property(e => e.LastUpdatedDate);
+
+            // 🔗 LeadSource FK
+            entity.HasOne(e => e.LeadSource)
+                .WithMany(s => s.Leads)
+                .HasForeignKey(e => e.LeadSourceId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // 🔗 LeadStatus FK
+            entity.HasOne(e => e.LeadStatus)
+                .WithMany(s => s.Leads)
+                .HasForeignKey(e => e.LeadStatusId)
+                .OnDelete(DeleteBehavior.Restrict);
         });
 
+        // 🔹 LEAD SOURCE
         modelBuilder.Entity<LeadSource>(entity =>
         {
-            entity.HasKey(e => e.LeadSourceId).HasName("PK__LeadSour__9FB37DD356A3AFE1");
-
-            entity.Property(e => e.CreatedDate)
-                .HasDefaultValueSql("(getdate())")
-                .HasColumnType("datetime");
-            entity.Property(e => e.SourceName).HasMaxLength(100);
+            entity.HasKey(e => e.LeadSourceId);
+            entity.Property(e => e.SourceName).HasMaxLength(100).IsRequired();
         });
 
+        // 🔹 LEAD STATUS
+        modelBuilder.Entity<LeadStatus>(entity =>
+        {
+            entity.HasKey(e => e.LeadStatusId);
+            entity.Property(e => e.StatusName).HasMaxLength(50).IsRequired();
+        });
+
+        // 🔹 LEAD ASSIGNMENT
+        modelBuilder.Entity<LeadAssignment>(entity =>
+        {
+            entity.HasKey(e => e.AssignmentId);
+
+            entity.Property(e => e.AssignedDate)
+                .HasDefaultValueSql("GETDATE()");
+
+            entity.HasOne(e => e.Lead)
+                .WithMany(l => l.Assignments)
+                .HasForeignKey(e => e.LeadId)
+                .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        // 🔹 LEAD NOTES
+        modelBuilder.Entity<LeadNote>(entity =>
+        {
+            entity.HasKey(e => e.NoteId);
+
+            entity.Property(e => e.CreatedDate)
+                .HasDefaultValueSql("GETDATE()");
+
+            entity.HasOne(e => e.Lead)
+                .WithMany(l => l.Notes)
+                .HasForeignKey(e => e.LeadId)
+                .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        // 🔹 FOLLOWUPS
+        modelBuilder.Entity<Followup>(entity =>
+        {
+            entity.HasKey(e => e.FollowupId);
+
+            entity.Property(e => e.FollowupDateTime).IsRequired();
+            entity.Property(e => e.Status)
+                .HasMaxLength(50)
+                .HasDefaultValue("Pending");
+
+            entity.HasOne(e => e.Lead)
+                .WithMany(l => l.Followups)
+                .HasForeignKey(e => e.LeadId)
+                .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        // 🔹 NOTIFICATIONS
         modelBuilder.Entity<Notification>(entity =>
         {
-            entity.HasKey(e => e.NotificationId).HasName("PK__Notifica__20CF2E12479FBB78");
+            entity.HasKey(e => e.NotificationId);
+
+            entity.Property(e => e.Title).HasMaxLength(200);
+            entity.Property(e => e.Message).HasMaxLength(500);
 
             entity.Property(e => e.CreatedDate)
-                .HasDefaultValueSql("(getdate())")
-                .HasColumnType("datetime");
-            entity.Property(e => e.Message).HasMaxLength(500);
-            entity.Property(e => e.NotificationType).HasMaxLength(50);
-            entity.Property(e => e.Title).HasMaxLength(200);
+                .HasDefaultValueSql("GETDATE()");
         });
 
-        modelBuilder.Entity<User>(entity =>
+        // 🔹 EMAIL QUEUE
+        modelBuilder.Entity<EmailQueue>(entity =>
         {
-            entity.HasKey(e => e.UserId).HasName("PK__Users__1788CC4C846315F8");
+            entity.HasKey(e => e.EmailId);
 
-            entity.HasIndex(e => e.Email, "UQ__Users__A9D10534CEED452C").IsUnique();
+            entity.Property(e => e.Email).HasMaxLength(150);
+            entity.Property(e => e.Subject).HasMaxLength(200);
+            entity.Property(e => e.Status)
+                .HasMaxLength(50)
+                .HasDefaultValue("Pending");
 
             entity.Property(e => e.CreatedDate)
-                .HasDefaultValueSql("(getdate())")
-                .HasColumnType("datetime");
-            entity.Property(e => e.Email).HasMaxLength(150);
-            entity.Property(e => e.IsActive).HasDefaultValue(true);
-            entity.Property(e => e.LastLogin).HasColumnType("datetime");
+                .HasDefaultValueSql("GETDATE()");
+        });
+
+        // 🔹 USERS
+        modelBuilder.Entity<User>(entity =>
+        {
+            entity.HasKey(e => e.UserId);
+
             entity.Property(e => e.Name).HasMaxLength(150);
-            entity.Property(e => e.PasswordHash).HasMaxLength(255);
+            entity.Property(e => e.Email).HasMaxLength(150);
             entity.Property(e => e.Phone).HasMaxLength(20);
             entity.Property(e => e.Role).HasMaxLength(50);
 
-            entity.HasOne(d => d.Manager).WithMany(p => p.InverseManager)
-                .HasForeignKey(d => d.ManagerId)
-                .HasConstraintName("FK_Users_Manager");
+            entity.Property(e => e.CreatedDate)
+                .HasDefaultValueSql("GETDATE()");
         });
-
-        OnModelCreatingPartial(modelBuilder);
     }
-
-    partial void OnModelCreatingPartial(ModelBuilder modelBuilder);
 }

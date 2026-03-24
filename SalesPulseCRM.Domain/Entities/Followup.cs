@@ -3,19 +3,19 @@ using System.Collections.Generic;
 
 namespace SalesPulseCRM.Domain.Entities;
 
-public partial class Followup
+public class Followup
 {
     public int FollowupId { get; set; }
 
     public int LeadId { get; set; }
-
     public int UserId { get; set; }
 
     public DateTime FollowupDateTime { get; set; }
-
     public string? Remarks { get; set; }
 
     public string Status { get; set; } = null!;
+    public bool ReminderSent { get; set; } = false;
 
-    public bool ReminderSent { get; set; }
+    // 🔗 Navigation
+    public Lead Lead { get; set; } = null!;
 }

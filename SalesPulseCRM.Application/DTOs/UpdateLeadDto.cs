@@ -1,25 +1,20 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace SalesPulseCRM.Application.DTOs
 {
-
-    public class CreateLeadDto
+    public class UpdateLeadDto
     {
-        public string CustomerName { get; set; } = null!;
+        public int LeadId { get; set; }
 
-        [RegularExpression(@"^[0-9]{10}$", ErrorMessage = "Enter valid 10 digit phone")]
+        public string CustomerName { get; set; } = null!;
         public string Phone { get; set; } = null!;
         public string? Email { get; set; }
 
         public int? LeadSourceId { get; set; }
-
-        // optional assignment at creation
-        public int? AssignedTo { get; set; }
+        public int? LeadStatusId { get; set; }
     }
-
 }

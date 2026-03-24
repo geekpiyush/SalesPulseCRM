@@ -3,11 +3,10 @@ using System.Collections.Generic;
 
 namespace SalesPulseCRM.Domain.Entities;
 
-public partial class LeadSource
+public class LeadSource
 {
     public int LeadSourceId { get; set; }
-
     public string SourceName { get; set; } = null!;
 
-    public DateTime CreatedDate { get; set; }
+    public ICollection<Lead> Leads { get; set; } = new List<Lead>();
 }

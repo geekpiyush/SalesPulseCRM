@@ -1,110 +1,147 @@
-﻿@using SalesPulseCRM.Application.DTOs
-@model CreateLeadDto
-@{
-    Layout = "~/Views/Shared/_Layout.cshtml";
-    ViewData["Title"] = "Create Lead";
-}
+﻿@model CreateLeadDto
 
-<link href="~/css/AuthController/Register.css" rel="stylesheet" />
+<link href="~/css/LeadController/CreateLead.css" rel="stylesheet" />
+<div class="page-content p-3 p-md-4">
 
-<div class="container-fluid">
-    <div class="row justify-content-center">
+    <!-- HEADER -->
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h5 class="fw-bold m-0">Add Leads</h5>
 
-        <div class="col-12 col-md-10 col-lg-7 col-xl-6">
+        <div class="btn-group">
+            <button type="button" class="btn btn-outline-primary active" id="manualBtn">
+                Manual Entry
+            </button>
+            <button type="button" class="btn btn-outline-primary" id="importBtn">
+                Import CSV
+            </button>
+        </div>
+    </div>
 
-            <div class="card-glass p-4 mt-4">
+    <!-- 🔹 MANUAL FORM -->
+    <div id="manualForm">
 
-                <div class="d-flex justify-content-between align-items-center mb-3">
-                    <h4 class="mb-0">👤 Create Lead</h4>
-                    <a href="/Users" class="btn btn-sm btn-outline-light">Back</a>
+        <form asp-action="Create" method="post">
+
+            <div class="row g-3">
+
+                <div class="col-md-6">
+                    <div class="form-floating">
+                        <input asp-for="CustomerName" class="form-control custom-input" placeholder="Name" />
+                        <label>Customer Name</label>
+                    </div>
                 </div>
 
-                <hr style="border-color: rgba(255,255,255,0.1);" />
-
-                <!-- SUCCESS -->
-                @if (TempData["Success"] != null)
-                {
-                    <div class="alert alert-success">@TempData["Success"]</div>
-                }
-
-                <form asp-action="CreateLead" asp-controller="Lead" method="post">
-
-                    <!-- NAME -->
-                    <div class="mb-3">
-                        <label asp-for="CustomerName" class="form-label text-secondary"></label>
-                        <input asp-for="CustomerName" class="form-control" />
-                        <span asp-validation-for="CustomerName" class="text-danger"></span>
+                <div class="col-md-6">
+                    <div class="form-floating">
+                        <input asp-for="Phone" id="phoneInput" class="form-control custom-input" placeholder="Phone" />
+                        <label>Phone</label>
                     </div>
+                </div>
 
-                    <!-- EMAIL -->
-                    <div class="mb-3">
-                        <label asp-for="Email" class="form-label text-secondary"></label>
-                        <input asp-for="Email" class="form-control" />
-                        <span asp-validation-for="Email" class="text-danger"></span>
+                <div class="col-md-6">
+                    <div class="form-floating">
+                        <input asp-for="Email" class="form-control custom-input" placeholder="Email" />
+                        <label>Email</label>
                     </div>
+                </div>
 
-                    <!-- PHONE -->
-                    <div class="mb-3">
-                        <label asp-for="Phone" class="form-label text-secondary"></label>
-                        <input asp-for="Phone" class="form-control" />
-                    </div>
-
-               @*      <!-- PASSWORD -->
-                    <div class="mb-3">
-                        <label asp-for="Password" class="form-label text-secondary"></label>
-                        <input asp-for="Password" type="password" class="form-control" />
-                        <span asp-validation-for="Password" class="text-danger"></span>
-                    </div> *@
-
-                    <!-- ROLE -->
-                    <div class="mb-3">
-                        <label asp-for="LeadSource" class="form-label text-secondary"></label>
-                        <select asp-for="LeadSource" class="form-control">
+                <div class="col-md-6">
+                    <div class="form-floating">
+                        <select asp-for="LeadSourceId" class="form-select custom-input">
                             <option value="">Select Source</option>
-                            <option>Meta</option>
-                            <option>PPC</option>
-                            <option>Customer</option>
+                            @foreach (var source in ViewBag.Sources)
+                            {
+                                <option value="@source.LeadSourceId">@source.SourceName</option>
+                            }
                         </select>
-                        <span asp-validation-for="LeadSource" class="text-danger"></span>
+                        <label>Lead Source</label>
                     </div>
+                </div>
 
-                    <div class="mb-3">
-                        <label asp-for="LeadStatus" class="form-label text-secondary"></label>
-                        <select asp-for="LeadStatus" class="form-control">
-                            <option value="">Lead Status</option>
-                            <option>New</option>
-                            <option>Hot</option>
-                            <option>Cold</option>
-                            <option>Warm</option>
-                        </select>
-                        <span asp-validation-for="LeadStatus" class="text-danger"></span>
-                    </div>
+            </div>
 
-                    @* <div class="mb-3">
-                        <label asp-for="AssignedTo" class="form-label text-secondary"></label>
-                        <input asp-for="AssignedTo" class="form-control" />
-                    </div> *@
-                    <!-- STATUS -->
-                    @* <div class="mb-3">
-                        <label asp-for="IsActive" class="form-label text-secondary"></label>
-                        <select asp-for="IsActive" class="form-control">
-                            <option value="true">Active</option>
-                            <option value="false">Inactive</option>
-                        </select>
-                    </div> *@
+            <div class="mt-4">
+                <button class="btn btn-primary custom-btn">Save Lead</button>
+            </div>
 
-                    <div class="d-grid mt-3">
-                        <button class="btn btn-primary">Create Lead</button>
-                    </div>
+        </form>
+    </div>
 
-                </form>
+    <!-- 🔹 IMPORT SECTION -->
+    <div id="importSection" class="d-none">
+
+        <div class="import-wrapper">
+
+            <!-- ICON + TEXT -->
+            <div class="import-content text-center">
+
+                <div class="upload-icon mb-2">📂</div>
+
+                <h6 class="fw-semibold mb-1">Import Leads</h6>
+                <p class="small mb-3 " style="color:white;">
+                    Drag & drop CSV / Excel file or click to upload
+                </p>
+
+                <!-- Hidden file input -->
+                <input type="file" id="fileInput" hidden />
+
+                <!-- Upload button -->
+                <button type="button" class="btn btn-outline-light btn-sm mb-3" onclick="document.getElementById('fileInput').click()">
+                    Choose File
+                </button>
+
+                <div id="fileName" class="small text-success mb-2"></div>
+
+                <!-- Action -->
+                <button class="btn btn-success px-4">
+                    Upload & Import
+                </button>
+
+                <!-- Template -->
+                <div class="mt-3">
+                    <a href="/Lead/DownloadTemplate" class="small text-info">
+                        ⬇ Download CSV Template
+                    </a>
+                </div>
 
             </div>
 
         </div>
+
     </div>
+
 </div>
 
-@section Scripts {
-    <partial name="_ValidationScriptsPartial" />
-}
+<script>
+    const manualBtn = document.getElementById("manualBtn");
+    const importBtn = document.getElementById("importBtn");
+
+    const manualForm = document.getElementById("manualForm");
+    const importSection = document.getElementById("importSection");
+
+    manualBtn.onclick = () => {
+        manualForm.classList.remove("d-none");
+        importSection.classList.add("d-none");
+
+        manualBtn.classList.add("active");
+        importBtn.classList.remove("active");
+    };
+
+    importBtn.onclick = () => {
+        manualForm.classList.add("d-none");
+        importSection.classList.remove("d-none");
+
+        importBtn.classList.add("active");
+        manualBtn.classList.remove("active");
+    };
+
+     const fileInput = document.getElementById("fileInput");
+    const fileName = document.getElementById("fileName");
+
+    fileInput.addEventListener("change", function () {
+        if (this.files.length > 0) {
+            fileName.innerText = "Selected: " + this.files[0].name;
+        }
+    });
+</script>
+<partial name="_ValidationScriptsPartial" />

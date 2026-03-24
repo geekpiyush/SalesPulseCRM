@@ -18,40 +18,12 @@ namespace SalesPulseCRM.WEB.Controllers
         [HttpGet]
         public IActionResult CreateLead()
         {
+           ViewBag.Sources = _db.LeadSources.ToList();
+            ViewBag.Users = _db.Users.ToList();
             return View();
         }
 
-        [HttpPost]
-        public async Task<IActionResult> CreateLead(CreateLeadDto createLeadDto)
-        {
-            if(!ModelState.IsValid)
-            {
-                return View(createLeadDto);
-            }
-
-            //if(createLeadDto == null)
-            //{
-
-            //}
-
-            var existingLead = await _db.Leads.FirstOrDefaultAsync(temp => temp.Phone == createLeadDto.Phone);
-
-            if (existingLead != null)
-            {
-                ModelState.AddModelError("Phone", "Phone Number Already Exist");
-
-                return View(createLeadDto);
-            }
-
-            var leads = new Lead { CustomerName = createLeadDto.CustomerName, Email = createLeadDto.Email, Phone = createLeadDto.Phone, LeadStatus = createLeadDto.LeadStatus };
-                
-            _db.Leads.Add(leads);
-            await _db.SaveChangesAsync();
-
-            return RedirectToAction("Index", "Home");
-
-            
-        }
+ 
 
     }
 }
