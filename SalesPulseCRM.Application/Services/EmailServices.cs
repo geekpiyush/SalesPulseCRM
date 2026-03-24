@@ -29,5 +29,47 @@ namespace SalesPulseCRM.Application.Services
             mail.To.Add(toEmail);
             smtpClient.Send(mail);
         }
+
+
+        public void SendVerificationEmail(string toEmail, string link)
+        {
+            var smtpClient = new SmtpClient("smtp.gmail.com")
+            {
+                Port = 587,
+                Credentials = new NetworkCredential("dpiyush28@gmail.com", "zeopfoujocxhakbp"),
+                EnableSsl = true,
+            };
+
+            var body = $@"
+        <div style='font-family:Segoe UI;padding:20px'>
+            <h2 style='color:#2563eb'>Welcome to SalesPulse CRM 🚀</h2>
+            
+            <p>Hi,</p>
+            <p>Thank you for registering. Please verify your email to activate your account.</p>
+
+            <a href='{link}' 
+               style='display:inline-block;padding:10px 20px;
+                      background:#2563eb;color:white;
+                      text-decoration:none;border-radius:6px;'>
+               Verify Account
+            </a>
+
+            <p style='margin-top:20px;color:gray;font-size:12px'>
+                This link will expire in 24 hours.
+            </p>
+        </div>
+    ";
+
+            var mail = new MailMessage
+            {
+                From = new MailAddress("dpiyush28@gmail.com"),
+                Subject = "Verify Your Account | SalesPulseCRM",
+                Body = body,
+                IsBodyHtml = true,
+            };
+
+            mail.To.Add(toEmail);
+            smtpClient.Send(mail);
+        }
     }
 }

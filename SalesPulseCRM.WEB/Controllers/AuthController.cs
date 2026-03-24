@@ -67,6 +67,7 @@ namespace SalesPulseCRM.WEB.Controllers
                 return View(loginDto);
             }
 
+
             //var hash = BCrypt.Net.BCrypt.HashPassword(loginDto.Password);
             bool isValid =  BCrypt.Net.BCrypt.Verify(loginDto.Password, user.PasswordHash);
 
@@ -74,6 +75,12 @@ namespace SalesPulseCRM.WEB.Controllers
             {
                 ModelState.AddModelError("Password", "Invalid Password");
                 GenerateCaptcha();
+                return View(loginDto);
+            }
+
+            if(!user.IsActive)
+            {
+                ModelState.AddModelError("", "Please verify your email first.");
                 return View(loginDto);
             }
 
@@ -112,19 +119,57 @@ namespace SalesPulseCRM.WEB.Controllers
                 Phone = registerDto.Phone,
                 PasswordHash = BCrypt.Net.BCrypt.HashPassword(registerDto.Password),
                 Role = registerDto.Role,
-                IsActive = registerDto.IsActive,
+                IsActive = false,
                 CreatedDate = DateTime.Now,
 
             };
 
+
             _db.Users.Add(user);
             await _db.SaveChangesAsync();
+
+            var verifyToken = Guid.NewGuid().ToString();
+            user.EmailVerificationToken = verifyToken;
+            user.TokenExpiry = DateTime.Now.AddMinutes(30);
+
+            await _db.SaveChangesAsync();
+
+            var verifyLink = Url.Action("VerifyEmail", "Auth",
+            new { email = user.Email, token = user.TokenExpiry},
+            Request.Scheme);
+
+            _emailServices.SendVerificationEmail(user.Email, verifyLink);
 
             TempData["Success"] = "User Created Successfully";
             return RedirectToAction("Register");
         }
 
-        
+        [HttpGet]
+        public async Task<IActionResult> VerifyEmail(string email, string token)
+        {
+           var user = await _db.Users.FirstOrDefaultAsync(x => x.Email == email);
+            if(user == null)
+            {
+                return Content("Invalid Request");
+            }
+            if(user.TokenExpiry < DateTime.UtcNow)
+            {
+                return Content("Token expired");
+            }
+            if(user.EmailVerificationToken != token)
+            {
+                return Content("Invalid token");
+            }
+
+            user.IsActive = true;
+            user.EmailVerificationToken = null;
+            user.TokenExpiry = null; 
+            await _db.SaveChangesAsync();
+
+            return Content("Email verified successfully. You can login now.");
+        }
+
+
         public IActionResult Logout()
         {
             HttpContext.Session.Clear();

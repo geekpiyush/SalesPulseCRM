@@ -18,7 +18,7 @@ public partial class User
 
     public int? ManagerId { get; set; }
 
-    public bool IsActive { get; set; }
+    public bool IsActive { get; set; } = false;
 
     public DateTime? CreatedDate { get; set; }
 
@@ -29,4 +29,7 @@ public partial class User
     public virtual User? Manager { get; set; }
     public string? ResetToken { get; set; }
     public DateTime? ResetTokenExpiry { get; set; }
+    public string? EmailVerificationToken { get; set; }
+
+    public DateTime? TokenExpiry { get; set; }
 }
