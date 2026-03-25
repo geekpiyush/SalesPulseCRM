@@ -1,0 +1,126 @@
+﻿@{
+    var team = ViewBag.Team;
+    var users = ViewBag.Users;
+    var members = ViewBag.Members as List<int> ?? new List<int>();
+}
+<link href="~/css/TeamController/ManageMember.css" rel="stylesheet" asp-append-version="true" />
+
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css" />
+
+<div class="container py-4">
+
+    <!-- HEADER -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+
+        <div>
+            <h3 class="fw-semibold mb-1">@team.TeamName</h3>
+            <span class="small">
+                Managed by <span class="text-primary fw-medium">@team.Manager.Name</span>
+            </span>
+        </div>
+
+        <button type="submit" form="memberForm" class="btn btn-primary px-4">
+            Save Changes
+        </button>
+
+    </div>
+
+    <form id="memberForm" asp-action="AddMembers" method="post">
+        <input type="hidden" name="teamId" value="@team.TeamId" />
+
+        <div class="table-wrapper">
+
+            <table id="usersTable" class="table custom-table">
+
+                <thead>
+                    <tr>
+                        <th style="width: 60px;">✔</th>
+                        <th>User</th>
+                        <th style="width: 150px;">Role</th>
+                        <th style="width: 120px;">Status</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    @foreach (var user in users)
+                    {
+                        var isChecked = members.Contains(user.UserId);
+                        var isManager = user.UserId == team.ManagerId;
+
+                        <tr class="@(isManager ? "manager-row" : "")">
+
+                            <td>
+                                @if (!isManager)
+                                {
+                                    <input type="checkbox"
+                                           name="userIds"
+                                           value="@user.UserId"
+                                           @(isChecked ? "checked" : "") />
+                                }
+                                else
+                                {
+                                    <i class="bi bi-lock-fill text-primary"></i>
+                                }
+                            </td>
+
+                            <td class="fw-medium">
+                                @user.Name
+                            </td>
+
+                            <td>
+                                <span class="role-badge @user.Role.ToLower()">
+                                    @user.Role
+                                </span>
+                            </td>
+
+                            <td>
+                                @if (isManager)
+                                {
+                                    <span class="badge bg-primary">Manager</span>
+                                }
+                                else if (isChecked)
+                                {
+                                    <span class="badge bg-success">Member</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-secondary">Not Added</span>
+                                }
+                            </td>
+
+                        </tr>
+                    }
+                </tbody>
+
+            </table>
+
+        </div>
+    </form>
+
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+
+<script>
+
+    $(document).ready(function () {
+         $('#usersTable').DataTable({
+             pageLength: 5,
+             lengthChange: false,
+             ordering: false,
+             info: false,
+             language: {
+                 search: "",
+                 searchPlaceholder: "Search team members..."
+             }
+         });
+
+     
+
+        // auto hide alert
+        setTimeout(() => {
+            $('.auto-hide-alert').fadeOut(400);
+        }, 2000);
+    });
+</script>

@@ -1,0 +1,86 @@
+﻿@{
+    ViewData["Title"] = "Create Team";
+}
+
+<link href="~/css/TeamController/CreateTeam.css" rel="stylesheet" asp-append-version="true" />
+<div class="container py-4">
+
+    <!-- HEADER -->
+    <div class="mb-4">
+        <h4 class="fw-semibold mb-1">Create Team</h4>
+        <p class="text-muted small">Create a new team and assign a manager</p>
+    </div>
+
+    <!-- SUCCESS -->
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success auto-hide-alert">
+            @TempData["Success"]
+        </div>
+    }
+
+    <!-- ERROR -->
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger auto-hide-alert">
+            @TempData["Error"]
+        </div>
+    }
+
+    <!-- FORM -->
+    <form asp-action="CreateTeam" asp-controller="Team" method="post">
+
+        <div class="row g-3">
+
+            <!-- TEAM NAME -->
+            <div class="col-12 col-md-6">
+                <label class="form-label">Team Name</label>
+                <input name="teamName" class="form-control input-modern" placeholder="Enter team name" />
+            </div>
+
+            <!-- MANAGER -->
+            <div class="col-12 col-md-6">
+                <label class="form-label">Manager</label>
+                <select name="managerId" class="form-control input-modern select-modern">
+                    <option value="">Select Manager</option>
+
+                    @foreach (var manager in ViewBag.Managers)
+                    {
+                        <option value="@manager.UserId">@manager.Name</option>
+                    }
+                </select>
+            </div>
+
+        </div>
+
+        <!-- BUTTON -->
+        <div class="mt-4">
+            <button id="submitBtn" class="btn btn-primary px-4">
+                Create Team
+            </button>
+        </div>
+
+    </form>
+
+</div>
+<script>
+    // auto hide alerts
+    setTimeout(() => {
+        document.querySelectorAll(".auto-hide-alert").forEach(alertBox => {
+            alertBox.style.transition = "all 0.5s ease";
+            alertBox.style.opacity = "0";
+            alertBox.style.transform = "translateY(-10px)";
+
+            setTimeout(() => alertBox.remove(), 500);
+        });
+    }, 2000);
+
+    // button loading
+    const form = document.querySelector("form");
+    const btn = document.getElementById("submitBtn");
+
+    form.addEventListener("submit", () => {
+        btn.disabled = true;
+        btn.innerText = "Creating...";
+    });
+</script>

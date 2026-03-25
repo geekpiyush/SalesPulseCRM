@@ -101,7 +101,7 @@
 
             <div class="submenu">
 
-                <a asp-action="Create" asp-controller="Team">
+                <a asp-action="CreateTeam" asp-controller="Team">
                     <span>Add Team</span>
                 </a>
 
@@ -109,7 +109,7 @@
                     <span>View Teams</span>
                 </a>
 
-                <a asp-action="ManageMembers" asp-controller="Team">
+                <a asp-action="ManageMembers" asp-controller="Team" asp-route-teamId="1">
                     <span>Manage Members</span>
                 </a>
 

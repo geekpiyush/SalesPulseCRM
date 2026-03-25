@@ -1,0 +1,196 @@
+﻿/* ===============================
+   🔥 GLASS WRAPPER (PREMIUM)
+================================ */
+.table-wrapper {
+    background: rgba(255,255,255,0.08);
+    backdrop-filter: blur(16px);
+    border-radius: 18px;
+    padding: 16px;
+    border: 1px solid rgba(255,255,255,0.2);
+    box-shadow: 0 12px 35px rgba(0,0,0,0.3);
+}
+
+
+/* ===============================
+   🔥 TABLE BASE
+================================ */
+#usersTable {
+    width: 100%;
+    border-collapse: separate !important;
+    border-spacing: 0 12px !important; /* 🔥 REAL GAP BETWEEN ROWS */
+    color: #e5e7eb;
+}
+
+
+    /* ===============================
+   🔥 HEADER
+================================ */
+    #usersTable thead th {
+        background: rgba(255,255,255,0.15);
+        color: #ffffff;
+        font-size: 12px;
+        text-transform: uppercase;
+        letter-spacing: 0.6px;
+        padding: 14px;
+        border: none;
+    }
+
+
+    /* ===============================
+   🔥 ROW = CARD UI
+================================ */
+    #usersTable tbody tr {
+        background: rgba(255,255,255,0.06);
+        border-radius: 14px;
+        overflow: hidden;
+        box-shadow: 0 6px 18px rgba(0,0,0,0.25);
+        transition: all 0.25s ease;
+    }
+
+        /* hover = lift + glow */
+        #usersTable tbody tr:hover {
+            transform: translateY(-4px) scale(1.01);
+            box-shadow: 0 12px 30px rgba(79,70,229,0.35);
+            background: rgba(79,70,229,0.22);
+        }
+
+
+    /* ===============================
+   🔥 CELLS
+================================ */
+    #usersTable td {
+        padding: 16px 18px;
+        border: none !important;
+        vertical-align: middle;
+        background: transparent !important;
+    }
+        #usersTable td.fw-medium {
+            color: #ffffff;
+            font-weight: 600;
+            letter-spacing: 0.3px;
+        }
+
+    /* rounded edges */
+    #usersTable tbody tr td:first-child {
+        border-top-left-radius: 14px;
+        border-bottom-left-radius: 14px;
+    }
+
+    #usersTable tbody tr td:last-child {
+        border-top-right-radius: 14px;
+        border-bottom-right-radius: 14px;
+    }
+
+
+/* ===============================
+   🔥 MANAGER ROW (SPECIAL)
+================================ */
+.manager-row {
+    border-left: 4px solid #4f46e5;
+    background: rgba(79,70,229,0.18) !important;
+}
+
+    .manager-row:hover {
+        box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+    }
+
+
+/* ===============================
+   🔥 ROLE BADGES
+================================ */
+.role-badge {
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 500;
+}
+
+    .role-badge.admin {
+        background: rgba(239,68,68,0.25);
+        color: #ef4444;
+    }
+
+    .role-badge.manager {
+        background: rgba(59,130,246,0.25);
+        color: #3b82f6;
+    }
+
+    .role-badge.employee {
+        background: rgba(34,197,94,0.25);
+        color: #22c55e;
+    }
+
+
+/* ===============================
+   🔥 CHECKBOX
+================================ */
+#usersTable input[type="checkbox"] {
+    transform: scale(1.3);
+    cursor: pointer;
+    accent-color: #4f46e5;
+}
+
+
+/* ===============================
+   🔥 DATATABLE CUSTOM
+================================ */
+.dataTables_wrapper {
+    color: #fff;
+}
+
+/* search */
+.dataTables_filter input {
+    background: rgba(255,255,255,0.1) !important;
+    border: 1px solid rgba(255,255,255,0.2);
+    color: #fff !important;
+    border-radius: 10px;
+    padding: 6px 12px;
+    outline: none;
+}
+
+/* pagination */
+.dataTables_paginate .paginate_button {
+    color: #fff !important;
+    border: none;
+}
+
+    .dataTables_paginate .paginate_button.current {
+        background: rgba(79,70,229,0.4) !important;
+        border-radius: 6px;
+    }
+
+/* remove default borders */
+.dataTable.no-footer {
+    border-bottom: none !important;
+}
+
+#usersTable thead th {
+    border-bottom: none !important;
+}
+
+
+/* ===============================
+   🔥 MOBILE OPTIMIZATION
+================================ */
+@media (max-width: 768px) {
+
+    #usersTable {
+        border-spacing: 0 10px !important;
+    }
+
+        #usersTable thead {
+            display: none;
+        }
+
+        #usersTable tbody tr {
+            display: block;
+            padding: 12px;
+        }
+
+        #usersTable tbody td {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            font-size: 13px;
+        }
+}
