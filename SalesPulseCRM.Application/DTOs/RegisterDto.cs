@@ -23,7 +23,8 @@ namespace SalesPulseCRM.Application.DTOs
 
         [Required]
         public string Role { get; set; } = "Employee";
-        [Required]
+
+        public int? ManagerId { get; set; } // 🔥 ADD THIS
         public bool IsActive { get; set; }
     }
 }

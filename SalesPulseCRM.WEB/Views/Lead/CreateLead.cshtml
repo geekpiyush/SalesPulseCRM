@@ -23,18 +23,18 @@
 
         @if (TempData["Success"] != null)
         {
-            <div class="alert alert-success">
+            <div class="alert alert-success auto-hide-alert">
                 @TempData["Success"]
             </div>
         }
 
         @if (ViewBag.Error != null)
         {
-            <div class="alert alert-danger">
+            <div class="alert alert-danger auto-hide-alert">
                 @ViewBag.Error
             </div>
         }
-
+   
         @Html.ValidationSummary(true, "", new { @class = "text-danger mb-2" })
 
         <form asp-action="CreateLead" asp-controller="Lead" method="post">
@@ -245,6 +245,18 @@
     if (success) {
         console.log("Lead created"); // optional
     }
+     setTimeout(() => {
+        document.querySelectorAll(".auto-hide-alert").forEach(alertBox => {
+
+            alertBox.style.transition = "all 0.5s ease";
+            alertBox.style.opacity = "0";
+            alertBox.style.transform = "translateY(-10px)";
+
+            setTimeout(() => {
+                alertBox.remove();
+            }, 500);
+        });
+    }, 2000); // 2 sec
 </script>
 
 

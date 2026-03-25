@@ -90,8 +90,10 @@ namespace SalesPulseCRM.WEB.Controllers
         }
 
         [HttpGet]
-        public IActionResult Register()
+        public async Task<IActionResult> RegisterAsync()
         {
+            ViewBag.Managers = await _db.Users.Where(temp => temp.Role == "Manager").ToListAsync();
+
             return View();
         }
 
@@ -100,16 +102,34 @@ namespace SalesPulseCRM.WEB.Controllers
         {
             if(!ModelState.IsValid)
             {
+                ViewBag.Managers = await _db.Users
+                 .Where(x => x.Role == "Manager")
+                 .ToListAsync();
+
                 return View(registerDto);
             }
 
+            if (registerDto.Role == "Employee" && registerDto.ManagerId == null)
+            {
+                TempData["Error"] = "Manager is required for Employee";
+
+                ViewBag.Managers = await _db.Users
+                    .Where(x => x.Role == "Manager")
+                    .ToListAsync();
+
+                return View(registerDto);
+            }
             //find user already exist
 
             var existingUser = await _db.Users.AnyAsync(temp => temp.Email == registerDto.Email);
 
             if(existingUser)
             {
-                ModelState.AddModelError("Email", "Email Already Exists");
+                TempData["Error"] = "Email Already Exists";
+                ViewBag.Managers = await _db.Users
+                .Where(x => x.Role == "Manager")
+                .ToListAsync();
+
                 return View(registerDto);
             }
 
@@ -120,6 +140,7 @@ namespace SalesPulseCRM.WEB.Controllers
                 Phone = registerDto.Phone,
                 PasswordHash = BCrypt.Net.BCrypt.HashPassword(registerDto.Password),
                 Role = registerDto.Role,
+                ManagerId = registerDto.ManagerId,
                 IsActive = false,
                 CreatedDate = DateTime.Now,
 
