@@ -1,95 +1,168 @@
-﻿.custom-input {
-    height: 54px;
-    font-size: 15px;
-    border-radius: 12px;
-    border: 1px solid #e4e7ec;
+﻿/* ===============================
+   🔥 UNIFIED DARK INPUT SYSTEM
+================================ */
+
+/* FORCE BOOTSTRAP OVERRIDE */
+.form-control.input-modern,
+.form-select.input-modern,
+textarea.input-modern {
+    height: 40px;
+    font-size: 14px;
+    border-radius: 10px;
+    background: rgba(255,255,255,0.05) !important;
+    border: 1px solid rgba(255,255,255,0.1) !important;
+    color: #fff !important;
+    padding: 6px 10px;
     transition: all 0.2s ease;
 }
 
-    .custom-input:focus {
-        border-color: #4f46e5;
-        box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
-    }
-
-/* Floating label fix */
-.form-floating > label {
-    font-size: 13px;
-    color: #6c757d;
+/* textarea fix */
+textarea.input-modern {
+    height: auto;
+    min-height: 80px;
+    resize: none;
 }
 
-/* Button */
-.custom-btn {
-    height: 50px;
-    border-radius: 12px;
+/* placeholder */
+.input-modern::placeholder {
+    color: rgba(255,255,255,0.4);
+}
+
+/* focus */
+.input-modern:focus {
+    border-color: #4f46e5 !important;
+    box-shadow: 0 0 0 1px rgba(79,70,229,0.3) !important;
+    outline: none;
+}
+
+/* hover */
+.input-modern:hover {
+    border-color: rgba(79,70,229,0.5);
+}
+
+/* ===============================
+   🔥 SELECT FIX
+================================ */
+select.input-modern {
+    appearance: none;
+    padding-right: 30px;
+    cursor: pointer;
+}
+
+    /* dropdown options */
+    select.input-modern option {
+        background: #0f172a;
+        color: #fff;
+    }
+
+/* disabled */
+.input-modern:disabled {
+    opacity: 0.6;
+    background: rgba(255,255,255,0.02) !important;
+}
+
+/* ===============================
+   🔥 LABEL STYLE
+================================ */
+.custom-label {
+    font-size: 12px;
     font-weight: 500;
+    color: #cbd5f5;
+    margin-bottom: 4px;
+    display: block;
 }
 
-/* Sticky Mobile Button */
-.mobile-submit {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    background: #fff;
-    padding: 10px;
-    border-top: 1px solid #ddd;
+/* ===============================
+   🔥 BUTTON (PREMIUM)
+================================ */
+.btn-primary {
+    height: 40px;
+    border-radius: 10px;
+    font-size: 14px;
+    padding: 6px 16px;
+    background: linear-gradient(135deg, #4f46e5, #2563eb);
+    border: none;
 }
 
-/* Prevent zoom on mobile */
-@media (max-width: 768px) {
-    .custom-input {
-        font-size: 16px;
-        height: 50px;
-    }
-}
-.custom-input {
-    height: 54px;
-    border-radius: 12px;
-    border: 1px solid #e4e7ec;
-    transition: 0.2s;
-}
-
-    .custom-input:focus {
-        border-color: #4f46e5;
-        box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+    .btn-primary:hover {
+        background: linear-gradient(135deg, #4338ca, #1d4ed8);
     }
 
-.custom-btn {
-    height: 50px;
-    border-radius: 12px;
-}
-
-/* Import box */
-.import-box {
-    border: 2px dashed #d0d5dd;
-    border-radius: 12px;
-    background: #fafafa;
-}
+/* ===============================
+   🔥 IMPORT SECTION (CLEAN)
+================================ */
 .import-wrapper {
-    border: 1.5px dashed rgba(255,255,255,0.2);
-    border-radius: 14px;
-    padding: 40px 20px;
+    border: 1.5px dashed rgba(255,255,255,0.15);
+    border-radius: 16px;
+    padding: 30px 15px;
     background: rgba(255,255,255,0.02);
-    transition: all 0.2s ease;
+    transition: all 0.25s ease;
+    text-align: center;
 }
 
     .import-wrapper:hover {
         border-color: #4f46e5;
-        background: rgba(79, 70, 229, 0.05);
+        background: rgba(79, 70, 229, 0.06);
     }
 
 .upload-icon {
-    font-size: 32px;
+    font-size: 30px;
+    opacity: 0.9;
 }
 
 #importSection h6 {
     font-size: 16px;
+    color: #fff;
 }
 
 #importSection p {
     font-size: 13px;
+    color: rgba(255,255,255,0.6);
 }
 
 #fileName {
     font-weight: 500;
+    color: #22c55e;
+}
+
+#importSection .btn-outline-light {
+    border-color: rgba(255,255,255,0.3);
+    color: #fff;
+}
+
+    #importSection .btn-outline-light:hover {
+        background: rgba(255,255,255,0.1);
+    }
+
+#importSection .btn-success {
+    border-radius: 10px;
+    padding: 10px 20px;
+}
+
+#importSection a {
+    color: #38bdf8;
+    text-decoration: none;
+}
+
+    #importSection a:hover {
+        text-decoration: underline;
+    }
+
+/* ===============================
+   🔥 MOBILE FIX
+================================ */
+@media (max-width: 768px) {
+
+    .input-modern {
+        height: 42px;
+        font-size: 14px;
+    }
+
+    .btn-primary {
+        width: 100%;
+    }
+
+    .import-wrapper {
+        padding: 20px 10px;
+    }
 }

@@ -13,12 +13,16 @@ public class CrmDbContext : DbContext
     public DbSet<Lead> Leads { get; set; }
     public DbSet<LeadSource> LeadSources { get; set; }
     public DbSet<LeadStatus> LeadStatuses { get; set; }
+
     public DbSet<LeadAssignment> LeadAssignments { get; set; }
     public DbSet<LeadNote> LeadNotes { get; set; }
     public DbSet<Followup> Followups { get; set; }
     public DbSet<Notification> Notifications { get; set; }
     public DbSet<EmailQueue> EmailQueues { get; set; }
     public DbSet<User> Users { get; set; }
+    public DbSet<State> States { get; set; }
+    public DbSet<City> Cities { get; set; }
+    public DbSet<Project> Projects { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

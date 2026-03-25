@@ -19,10 +19,18 @@ public class Lead
     public DateTime? LastUpdatedDate { get; set; }
 
     public bool IsDeleted { get; set; } = false;
+    public int? StateId { get; set; }
+    public int? CityId { get; set; }
+    public int? ProjectId { get; set; }
 
     // 🔗 Navigation
     public LeadSource? LeadSource { get; set; }
     public LeadStatus? LeadStatus { get; set; }
+ 
+
+    public State? State { get; set; }
+    public City? City { get; set; }
+    public Project? Project { get; set; }
 
     public ICollection<LeadAssignment> Assignments { get; set; } = new List<LeadAssignment>();
     public ICollection<LeadNote> Notes { get; set; } = new List<LeadNote>();

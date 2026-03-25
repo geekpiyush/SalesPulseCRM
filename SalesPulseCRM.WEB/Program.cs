@@ -1,5 +1,6 @@
 ﻿using Hangfire;
 using Microsoft.EntityFrameworkCore;
+using SalesPulseCRM.Application.ServiceContracts;
 using SalesPulseCRM.Application.Services;
 using SalesPulseCRM.Infrastructure.DB;
 
@@ -28,6 +29,8 @@ builder.Services.AddSession(options =>
     options.Cookie.HttpOnly = true;
     options.Cookie.IsEssential = true;
 });
+
+builder.Services.AddScoped<ILeadService , LeadService>();
 
 // Auth (ADD THIS)
 builder.Services.AddAuthentication("MyCookieAuth")

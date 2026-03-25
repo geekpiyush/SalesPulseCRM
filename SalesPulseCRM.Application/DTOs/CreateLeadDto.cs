@@ -10,16 +10,24 @@ namespace SalesPulseCRM.Application.DTOs
 
     public class CreateLeadDto
     {
+        [Required]
+        [StringLength(100)]
         public string CustomerName { get; set; } = null!;
 
-        [RegularExpression(@"^[0-9]{10}$", ErrorMessage = "Enter valid 10 digit phone")]
+        [Required]
+        [RegularExpression(@"^[0-9]{10}$", ErrorMessage = "Invalid phone number")]
         public string Phone { get; set; } = null!;
+
+        [EmailAddress]
         public string? Email { get; set; }
 
+        [Required]
+        public int? StateId { get; set; }
+        [Required]
+        public int? CityId { get; set; }
+        [Required]
+        public int? ProjectId { get; set; }
         public int? LeadSourceId { get; set; }
-
-        // optional assignment at creation
-        public int? AssignedTo { get; set; }
     }
 
 }

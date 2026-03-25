@@ -15,4 +15,9 @@
     <PackageReference Include="Hangfire.SqlServer" Version="1.8.23" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\SalesPulseCRM.Domain\SalesPulseCRM.Domain.csproj" />
+    <ProjectReference Include="..\SalesPulseCRM.Infrastructure\SalesPulseCRM.Infrastructure.csproj" />
+  </ItemGroup>
+
 </Project>

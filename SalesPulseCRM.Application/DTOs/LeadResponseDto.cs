@@ -8,20 +8,22 @@ namespace SalesPulseCRM.Application.DTOs
 {
     public class LeadResponseDto
     {
-        public int LeadId { get; set; }
+        
+            public int LeadId { get; set; }
 
-        public string CustomerName { get; set; } = null!;
-        public string Phone { get; set; } = null!;
-        public string? Email { get; set; }
+            public string CustomerName { get; set; } = null!;
 
-        public string? LeadSource { get; set; }
-        public string? LeadStatus { get; set; }
+            public string Phone { get; set; } = null!;
 
-        public DateTime CreatedDate { get; set; }
+            public string? Email { get; set; }
 
-        public int NotesCount { get; set; }
-        public int FollowupCount { get; set; }
+            public string? StateName { get; set; }
+            public string? CityName { get; set; }
 
-        public int? LastAssignedTo { get; set; }
+            public string? ProjectName { get; set; }
+            public string? SourceName { get; set; }
+
+            public DateTime CreatedDate { get; set; }
+        
     }
 }
