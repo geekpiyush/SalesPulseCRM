@@ -1,0 +1,79 @@
+﻿@model List<TeamViewModel>
+
+
+<link href="~/css/TeamController/ViewTeam.css" rel="stylesheet" />
+<div class="container-fluid mt-3">
+
+    <!-- HEADER -->
+    <div class="page-header">
+        <h4 class="page-title">Teams</h4>
+        <<a asp-action="CreateTeam" asp-controller="Team" class="create-btn">
+            <span class="btn-icon">+</span>
+            <span>Create Team</span>
+        </a>
+    </div>
+
+    <!-- SEARCH -->
+    <input type="text" id="searchInput" class="search-box" placeholder="Search teams...">
+
+    <!-- GRID -->
+    <div class="row g-3" id="teamContainer">
+
+        @foreach (var team in Model)
+        {
+            <div class="col-12 col-md-6 col-lg-4 team-item">
+                <div class="team-card"
+                     onclick="goToTeam(@team.TeamId)">
+
+                    <div class="d-flex justify-content-between">
+                        <div class="team-title">@team.TeamName</div>
+                        <div class="member-badge">@team.MemberCount</div>
+                    </div>
+
+                    <div class="manager">
+                        <div class="avatar">
+                            @team.ManagerName.Substring(0, 1)
+                        </div>
+
+                        <div class="manager-info">
+                            <div class="manager-label">Manager</div>
+                            <div class="manager-name">@team.ManagerName</div>
+                        </div>
+                    </div>
+
+                    <button class="manage-btn">
+                        Manage Team →
+                    </button>
+                </div>
+            </div>
+        }
+
+    </div>
+
+    <!-- EMPTY -->
+    @if (!Model.Any())
+    {
+        <div class="empty">
+            <h5>No Teams Found</h5>
+            <p>Create your first team</p>
+        </div>
+    }
+
+</div>
+
+<script>
+    function goToTeam(id) {
+        window.location = "/Team/ManageMembers?teamId=" + id;
+    }
+
+    /* ===== SEARCH FILTER ===== */
+    document.getElementById("searchInput").addEventListener("keyup", function () {
+        let value = this.value.toLowerCase();
+        let items = document.querySelectorAll(".team-item");
+
+        items.forEach(item => {
+            let text = item.innerText.toLowerCase();
+            item.style.display = text.includes(value) ? "block" : "none";
+        });
+    });
+</script>

@@ -86,6 +86,8 @@ namespace SalesPulseCRM.WEB.Controllers
             }
 
             HttpContext.Session.SetString("UserName", user.Name);
+            HttpContext.Session.SetString("UserRole", user.Role);
+            HttpContext.Session.SetInt32("UserId", user.UserId);
             return RedirectToAction("Index","Home");
         }
 

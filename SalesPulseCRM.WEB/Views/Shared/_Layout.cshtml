@@ -1,5 +1,6 @@
 ﻿@{
     var userName = Context.Session.GetString("UserName") ?? "User";
+    var role = Context.Session.GetString("UserRole") ?? "";
 }
 <!DOCTYPE html>
 <html lang="en">
@@ -40,10 +41,12 @@
             </a>
 
             <div class="submenu">
-                <a asp-action="CreateLead" asp-controller="Lead">
-                    <span>Add Lead</span>
-                </a>
-
+                @if(role == "Admin" || role == "Manager")
+                {
+                    <a asp-action="CreateLead" asp-controller="Lead">
+                        <span>Add Lead</span>
+                    </a>
+                }
                 <a asp-action="Index" asp-controller="Lead">
                     <span>View Leads</span>
                 </a>
@@ -77,18 +80,22 @@
             </a>
 
             <div class="submenu">
+                @if(role == "Admin")
+                {
+                    <a asp-action="Register" asp-controller="Auth">
+                        <span>Add Employee</span>
+                    </a>
 
-                <a asp-action="Create" asp-controller="Users">
-                    <span>Add Employee</span>
-                </a>
+                    <a asp-action="Index" asp-controller="Users">
+                        <span>View Employees</span>
+                    </a>
 
-                <a asp-action="Index" asp-controller="Users">
-                    <span>View Employees</span>
-                </a>
+                    <a asp-action="Performance" asp-controller="Users">
+                        <span>Performance</span>
+                    </a>
+                }
 
-                <a asp-action="Performance" asp-controller="Users">
-                    <span>Performance</span>
-                </a>
+             
 
             </div>
         </div>
@@ -100,17 +107,16 @@
             </a>
 
             <div class="submenu">
+                @if(role == "Admin")
+                {
+                    <a asp-action="CreateTeam" asp-controller="Team">
+                        <span>Add Team</span>
+                    </a>
+                }
+             
 
-                <a asp-action="CreateTeam" asp-controller="Team">
-                    <span>Add Team</span>
-                </a>
-
-                <a asp-action="Index" asp-controller="Team">
+                <a asp-action="ViewTeam" asp-controller="Team">
                     <span>View Teams</span>
-                </a>
-
-                <a asp-action="ManageMembers" asp-controller="Team" asp-route-teamId="1">
-                    <span>Manage Members</span>
                 </a>
 
                 <a asp-action="Performance" asp-controller="Team">
@@ -220,25 +226,34 @@
                 <!-- User -->
                 <div class="user-dropdown">
 
-                    <div class="user-trigger d-flex align-items-center gap-2">
-                        <div class="avatar">@userName.Substring(0,1)</div>
-                        <span>@userName</span>
-                        <i class="bi bi-chevron-down"></i>
-                    </div>
+                    @if (!string.IsNullOrEmpty(userName) && userName != "User")
+                    {
+                        <div class="user-trigger d-flex align-items-center gap-2">
+                            <div class="avatar">
+                                @(userName.Length > 0 ? userName.Substring(0, 1) : "U")
+                            </div>
+                            <span>@userName</span>
+                            <i class="bi bi-chevron-down"></i>
+                        </div>
 
-                    <div class="dropdown-menu-custom">
-                        <a asp-action="Register" asp-controller="Auth">
-                            <i class="bi bi-person-plus"></i> Add User
-                        </a>
+                        <div class="dropdown-menu-custom">
 
-                        <a href="#">
-                            <i class="bi bi-person"></i> Profile
-                        </a>
+                            <a href="#">
+                                <i class="bi bi-person"></i> Profile
+                            </a>
 
-                        <a asp-action="Logout" asp-controller="Auth">
-                            <i class="bi bi-box-arrow-right"></i> Logout
+                            <a asp-action="Logout" asp-controller="Auth">
+                                <i class="bi bi-box-arrow-right"></i> Logout
+                            </a>
+
+                        </div>
+                    }
+                    else
+                    {
+                        <a asp-action="Login" asp-controller="Auth" class="btn btn-outline-light btn-sm">
+                            <i class="bi bi-box-arrow-in-right"></i> Login
                         </a>
-                    </div>
+                    }
 
                 </div>
               
@@ -288,22 +303,27 @@
                 }
             });
         });
-             const userDropdown = document.querySelector(".user-dropdown");
-        const trigger = document.querySelector(".user-trigger");
-        const menu = document.querySelector(".dropdown-menu-custom");
+                      document.addEventListener("DOMContentLoaded", function () {
 
-        trigger.addEventListener("click", () => {
-            menu.style.display = menu.style.display === "block" ? "none" : "block";
+            const trigger = document.querySelector(".user-trigger");
+            const menu = document.querySelector(".dropdown-menu-custom");
+
+            if (!trigger || !menu) return;
+
+            // CLICK ON USER
+            trigger.addEventListener("click", function (e) {
+                e.stopPropagation(); // 🔥 MAIN FIX
+                menu.classList.toggle("show");
+            });
+
+            // CLICK OUTSIDE
+            document.addEventListener("click", function () {
+                menu.classList.remove("show");
+            });
+
         });
 
-        // Close on outside click
-        document.addEventListener("click", (e) => {
-            if (!userDropdown.contains(e.target)) {
-                menu.style.display = "none";
-            }
-        });
-
-                // Leads dropdown toggle
+                        // Leads dropdown toggle
             document.querySelectorAll(".menu-toggle").forEach(toggle => {
             toggle.addEventListener("click", (e) => {
                 e.preventDefault();   // 🔥 important

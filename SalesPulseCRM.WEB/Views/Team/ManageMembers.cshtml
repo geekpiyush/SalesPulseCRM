@@ -9,25 +9,32 @@
 
 <div class="container py-4">
 
-    <!-- HEADER -->
-    <div class="d-flex justify-content-between align-items-center mb-4">
+    
 
-        <div>
-            <h3 class="fw-semibold mb-1">@team.TeamName</h3>
-            <span class="small">
-                Managed by <span class="text-primary fw-medium">@team.Manager.Name</span>
-            </span>
-        </div>
-
-        <button type="submit" form="memberForm" class="btn btn-primary px-4">
-            Save Changes
-        </button>
-
-    </div>
-
-    <form id="memberForm" asp-action="AddMembers" method="post">
+    <form id="memberForm" asp-action="AddMember" method="post">
         <input type="hidden" name="teamId" value="@team.TeamId" />
 
+        <!-- HEADER -->
+        <div class="page-header mb-3">
+
+            <div>
+                <h4 class="mb-1 text-white">@team.TeamName</h4>
+                <small class="text-light">
+                    Managed by <span class="text-primary">@team.Manager.Name</span>
+                </small>
+            </div>
+
+            <div class="header-actions">
+                <button id="selectAllBtn" class="btn btn-outline-light btn-sm">
+                    Select All
+                </button>
+
+                <button type="submit" id="saveBtn" class="btn btn-primary px-4">
+                    Save Changes
+                </button>
+            </div>
+
+        </div>
         <div class="table-wrapper">
 
             <table id="usersTable" class="table custom-table">
@@ -76,15 +83,15 @@
                             <td>
                                 @if (isManager)
                                 {
-                                    <span class="badge bg-primary">Manager</span>
+                                    <span class="badge status-badge bg-primary">Manager</span>
                                 }
                                 else if (isChecked)
                                 {
-                                    <span class="badge bg-success">Member</span>
+                                    <span class="badge status-badge bg-success">Member</span>
                                 }
                                 else
                                 {
-                                    <span class="badge bg-secondary">Not Added</span>
+                                    <span class="badge status-badge bg-secondary">Not Added</span>
                                 }
                             </td>
 
@@ -98,29 +105,76 @@
     </form>
 
 </div>
+<div id="toast" class="custom-toast"></div>
+<script>
+    window.onload = function () {
+
+        var success = '@TempData["Success"]';
+        var error = '@TempData["Error"]';
+
+        if (success && success !== '') {
+            showToast(success, "success");
+        }
+
+        if (error && error !== '') {
+            showToast(error, "error");
+        }
+    };
+</script>
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
 
 <script>
 
-    $(document).ready(function () {
-         $('#usersTable').DataTable({
-             pageLength: 5,
-             lengthChange: false,
-             ordering: false,
-             info: false,
-             language: {
-                 search: "",
-                 searchPlaceholder: "Search team members..."
-             }
-         });
+       $(document).ready(function () {
 
-     
+        let table = $('#usersTable').DataTable({
+            pageLength: 5,
+            lengthChange: false,
+            ordering: false,
+            info: false,
+            language: {
+                search: "",
+                searchPlaceholder: "Search team members..."
+            }
+        });
 
-        // auto hide alert
-        setTimeout(() => {
-            $('.auto-hide-alert').fadeOut(400);
-        }, 2000);
+        // 🔥 checkbox change → update UI instantly
+        $(document).on("change", "input[name='userIds']", function () {
+
+            let row = $(this).closest("tr");
+            let badge = row.find(".status-badge");
+
+            if ($(this).is(":checked")) {
+                badge.removeClass("bg-secondary").addClass("bg-success").text("Member");
+                row.addClass("active-row");
+            } else {
+                badge.removeClass("bg-success").addClass("bg-secondary").text("Not Added");
+                row.removeClass("active-row");
+            }
+        });
+
+        // 🔥 SELECT ALL
+        $("#selectAllBtn").click(function () {
+            let checkboxes = $("input[name='userIds']");
+            let allChecked = checkboxes.length === checkboxes.filter(":checked").length;
+
+            checkboxes.prop("checked", !allChecked).trigger("change");
+
+            $(this).text(allChecked ? "Select All" : "Deselect All");
+        });
+
     });
+
+        function showToast(message, type) {
+        let toast = document.getElementById("toast");
+
+        toast.innerText = message;
+        toast.className = "custom-toast show " + type;
+
+        setTimeout(() => {
+            toast.classList.remove("show");
+        }, 2500);
+    }
 </script>
