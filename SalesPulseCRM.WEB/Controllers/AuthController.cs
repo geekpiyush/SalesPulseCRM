@@ -1,5 +1,7 @@
 ﻿using BCrypt.Net;
 using Hangfire;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SalesPulseCRM.Application.DTOs;
@@ -7,9 +9,11 @@ using SalesPulseCRM.Application.Helpers;
 using SalesPulseCRM.Application.Services;
 using SalesPulseCRM.Domain.Entities;
 using SalesPulseCRM.Infrastructure.DB;
+using System.Security.Claims;
 
 namespace SalesPulseCRM.WEB.Controllers
 {
+    [AllowAnonymous]
     public class AuthController : Controller
     {
         private readonly CrmDbContext _db;
@@ -24,8 +28,8 @@ namespace SalesPulseCRM.WEB.Controllers
         private void GenerateCaptcha()
         {
             var rand = new Random();
-            int num1 = rand.Next(1, 100);
-            int num2 = rand.Next(1, 100);
+            int num1 = rand.Next(1, 10);
+            int num2 = rand.Next(1, 10);
 
             HttpContext.Session.SetInt32("CaptchaAnswer", num1 + num2);
             ViewBag.CaptchaQuestion = $"{num1} + {num2} = ?";
@@ -85,10 +89,26 @@ namespace SalesPulseCRM.WEB.Controllers
                 return View(loginDto);
             }
 
+            // SESSION (optional)
             HttpContext.Session.SetString("UserName", user.Name);
             HttpContext.Session.SetString("UserRole", user.Role);
             HttpContext.Session.SetInt32("UserId", user.UserId);
-            return RedirectToAction("Index","Home");
+
+            // 🔥 AUTH COOKIE (THIS WAS MISSING)
+                 var claims = new List<Claim>
+                {
+                    new Claim(ClaimTypes.Name, user.Name),
+                    new Claim(ClaimTypes.Role, user.Role),
+                    new Claim("UserId", user.UserId.ToString())
+                };
+
+            var identity = new ClaimsIdentity(claims, "MyCookieAuth");
+            var principal = new ClaimsPrincipal(identity);
+
+            await HttpContext.SignInAsync("MyCookieAuth", principal);
+
+            // redirect
+            return RedirectToAction("Index", "Home");
         }
 
         [HttpGet]
@@ -221,6 +241,7 @@ namespace SalesPulseCRM.WEB.Controllers
         public IActionResult Logout()
         {
             HttpContext.Session.Clear();
+            HttpContext.SignOutAsync("MyCookieAuth");
 
             return RedirectToAction("Login", "Auth");
         }

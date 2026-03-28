@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SalesPulseCRM.Application.DTOs;
 using SalesPulseCRM.Application.ServiceContracts;
@@ -8,6 +9,7 @@ using Xunit.Sdk;
 
 namespace SalesPulseCRM.WEB.Controllers
 {
+    [Authorize]
     [Route("Lead")]
     public class LeadController : Controller
     {

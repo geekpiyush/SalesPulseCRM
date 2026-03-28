@@ -1,6 +1,7 @@
-﻿@{
-    var userName = Context.Session.GetString("UserName") ?? "User";
-    var role = Context.Session.GetString("UserRole") ?? "";
+﻿@using System.Security.Claims
+@{
+    var userName = User.Identity?.Name;
+    var role = User.FindFirst(ClaimTypes.Role)?.Value;
 }
 <!DOCTYPE html>
 <html lang="en">
@@ -41,7 +42,7 @@
             </a>
 
             <div class="submenu">
-                @if(role == "Admin" || role == "Manager")
+                @if(User.IsInRole("Admin" ) || User.IsInRole("Manager"))
                 {
                     <a asp-action="CreateLead" asp-controller="Lead">
                         <span>Add Lead</span>

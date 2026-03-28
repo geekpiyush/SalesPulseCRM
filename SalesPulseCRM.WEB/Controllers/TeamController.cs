@@ -1,10 +1,12 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SalesPulseCRM.Domain.Entities;
 using SalesPulseCRM.Infrastructure.DB;
 
 namespace SalesPulseCRM.WEB.Controllers
 {
+    [Authorize]
     public class TeamController : Controller
     {
         private readonly CrmDbContext _db;
