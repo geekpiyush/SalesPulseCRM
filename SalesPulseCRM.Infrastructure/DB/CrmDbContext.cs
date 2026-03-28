@@ -12,7 +12,7 @@ public class CrmDbContext : DbContext
 
     public DbSet<Lead> Leads { get; set; }
     public DbSet<LeadSource> LeadSources { get; set; }
-    public DbSet<LeadStatus> LeadStatuses { get; set; }
+    public DbSet<LeadStatus> LeadStatus { get; set; }
     public DbSet<LeadAssignment> LeadAssignments { get; set; }
     public DbSet<LeadNote> LeadNotes { get; set; }
     public DbSet<Followup> Followups { get; set; }

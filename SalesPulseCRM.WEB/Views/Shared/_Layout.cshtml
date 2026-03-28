@@ -48,9 +48,11 @@
                         <span>Add Lead</span>
                     </a>
                 }
-                <a asp-action="Index" asp-controller="Lead">
+
+                <a asp-action="GetAllLeads" asp-controller="Lead">
                     <span>View Leads</span>
                 </a>
+
             </div>
         </div>
 
@@ -81,7 +83,7 @@
             </a>
 
             <div class="submenu">
-                @if(role == "Admin")
+                @if(User.IsInRole("Admin"))
                 {
                     <a asp-action="Register" asp-controller="Auth">
                         <span>Add Employee</span>
@@ -108,7 +110,7 @@
             </a>
 
             <div class="submenu">
-                @if(role == "Admin")
+                @if(User.IsInRole("Admin"))
                 {
                     <a asp-action="CreateTeam" asp-controller="Team">
                         <span>Add Team</span>

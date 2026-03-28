@@ -58,14 +58,29 @@ namespace SalesPulseCRM.Application.Services
 
         public async Task<List<LeadResponseDto>> GetAllLeadsAsync()
         {
-            return await _db.Leads.Select(x => new LeadResponseDto
-            {
-                LeadId = x.LeadId,
-                CustomerName = x.CustomerName,
-                Phone = x.Phone,
-                Email = x.Email,
-                CreatedDate = x.CreatedDate
-            }).ToListAsync();
+            return await _db.Leads
+                .Include(x => x.LeadStatus)
+                .Include(x => x.Project)
+                .Include(x => x.City)
+                .Include(x => x.State)
+                .Include(x => x.LeadSource)
+                .Select(x => new LeadResponseDto
+                {
+                    LeadId = x.LeadId,
+                    CustomerName = x.CustomerName,
+                    Phone = x.Phone,
+                    Email = x.Email,
+
+                    LeadType = x.LeadStatus != null ? x.LeadStatus.StatusName : null,
+
+                    ProjectName = x.Project != null ? x.Project.ProjectName : null,   // 🔥 FIX
+                    CityName = x.City != null ? x.City.CityName : null,              // 🔥 FIX
+                    StateName = x.State != null ? x.State.StateName : null,
+                    SourceName = x.LeadSource != null ? x.LeadSource.SourceName : null,
+
+                    CreatedDate = x.CreatedDate
+                })
+                .ToListAsync();
         }
 
         public async Task<LeadResponseDto?> GetLeadByIdAsync(int id)

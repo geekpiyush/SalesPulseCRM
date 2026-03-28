@@ -28,6 +28,7 @@ namespace SalesPulseCRM.Application.DTOs
         [Required]
         public int? ProjectId { get; set; }
         public int? LeadSourceId { get; set; }
+        public int? LeadStatusId { get; set; }
     }
 
 }

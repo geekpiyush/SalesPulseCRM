@@ -67,7 +67,7 @@ namespace SalesPulseCRM.WEB.Controllers
             var team = new Team
             {
                 TeamName = teamName,
-                ManagerId = managerId,
+                ManagerId = managerId
 
             };
             _db.Teams.Add(team);

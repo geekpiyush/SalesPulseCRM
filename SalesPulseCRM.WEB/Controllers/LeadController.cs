@@ -10,7 +10,6 @@ using Xunit.Sdk;
 namespace SalesPulseCRM.WEB.Controllers
 {
     [Authorize]
-    [Route("Lead")]
     public class LeadController : Controller
     {
         private readonly CrmDbContext _db;
@@ -21,6 +20,7 @@ namespace SalesPulseCRM.WEB.Controllers
             ViewBag.Sources = await _db.LeadSources.ToListAsync();
             ViewBag.Users = await _db.Users.ToListAsync();
             ViewBag.States = await _db.States.ToListAsync();
+            ViewBag.LeadStatus = await _db.LeadStatus.ToListAsync();
             ViewBag.Projects = await _db.Projects
                 .Where(p => p.IsActive)
                 .ToListAsync();
@@ -73,6 +73,15 @@ namespace SalesPulseCRM.WEB.Controllers
 
             TempData["Success"] = result.message;
             return RedirectToAction("CreateLead", "Lead");
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetAllLeads()
+        {
+            await LoadDropdowns();
+            var allLeads = await _leadService.GetAllLeadsAsync();
+
+            return View(allLeads);
         }
 
     }

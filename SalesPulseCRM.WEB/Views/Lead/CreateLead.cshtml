@@ -112,6 +112,20 @@
                     <span asp-validation-for="LeadSourceId" class="text-danger"></span>
                 </div>
 
+
+                <!-- LeadStatus -->
+                <div class="col-12 col-md-6">
+                    <label class="form-label custom-label">Lead Status</label>
+                    <select asp-for="LeadStatusId" class="form-select  input-modern">
+                        <option value="">Select Status</option>
+                        @foreach (var source in ViewBag.LeadStatus)
+                        {
+                            <option value="@source.LeadStatusId">@source.StatusName</option>
+                        }
+                    </select>
+                    <span asp-validation-for="LeadStatusId" class="text-danger"></span>
+                </div>
+
             </div>
 
             <!-- Button -->

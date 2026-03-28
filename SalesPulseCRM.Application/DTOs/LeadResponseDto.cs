@@ -19,9 +19,10 @@ namespace SalesPulseCRM.Application.DTOs
 
             public string? StateName { get; set; }
             public string? CityName { get; set; }
-
+            public int? ProjectId { get; set; }
             public string? ProjectName { get; set; }
             public string? SourceName { get; set; }
+            public string? LeadType { get; set; }
 
             public DateTime CreatedDate { get; set; }
         
