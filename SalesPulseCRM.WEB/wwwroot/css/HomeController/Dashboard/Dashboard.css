@@ -99,7 +99,7 @@ body {
 
     .sidebar {
         left: -260px;
-        z-index: 999;
+        z-index: 1100;
     }
 
         .sidebar.active {
@@ -128,7 +128,7 @@ body {
     height: 100%;
     background: rgba(0,0,0,0.5);
     display: none;
-    z-index: 998;
+    z-index: 1090;
 }
 
     #overlay.active {
@@ -136,6 +136,9 @@ body {
     }
     /* TOPBAR */
 .topbar {
+    position: sticky;
+    top: 0;
+    z-index: 1000;
     background: rgba(255,255,255,0.04);
     backdrop-filter: blur(12px);
     border-radius: 14px;
@@ -286,19 +289,53 @@ body {
     position: absolute;
     right: 0;
     top: 110%;
-    background: #020617;
-    border-radius: 12px;
-    padding: 8px;
-    min-width: 180px;
     opacity: 0;
-    transform: translateY(10px);
     pointer-events: none;
-    transition: 0.25s ease;
-    z-index: 9999;
 }
 
     .dropdown-menu-custom.show {
         opacity: 1;
+        pointer-events: auto;
+    }
+.user-dropdown-menu {
+    position: relative;
+    right: 0;
+    top: 110%;
+    background: #020617;
+    border-radius: 12px;
+    padding: 8px;
+    min-width: 180px;
+    transform: translateY(10px);
+    transition: 0.25s ease;
+    z-index: 9999;
+}
+
+    .user-dropdown-menu.show {
+        opacity: 1;
         transform: translateY(0);
         pointer-events: auto;
     }
+.user-section {
+    position: relative;
+}
+
+/* CLEAN LOGIN BUTTON */
+.login-btn {
+    background: transparent;
+    border: 1px solid rgba(255,255,255,0.2);
+    color: #fff;
+    padding: 6px 14px;
+    border-radius: 8px;
+    text-decoration: none;
+    transition: 0.2s;
+}
+
+    .login-btn:hover {
+        background: #2563eb;
+        border-color: #2563eb;
+    }
+
+/* REMOVE THIS TRASH */
+.user-dropdown-menu {
+    all: unset;
+}

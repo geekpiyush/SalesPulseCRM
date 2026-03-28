@@ -224,33 +224,28 @@
                 </div>
 
                 <!-- User -->
-                <div class="user-dropdown">
+                <div class="user-section d-flex align-items-center gap-2">
 
-                    @if (!string.IsNullOrEmpty(userName) && userName != "User")
+                    @if (!string.IsNullOrEmpty(userName))
                     {
                         <div class="user-trigger d-flex align-items-center gap-2">
                             <div class="avatar">
-                                @(userName.Length > 0 ? userName.Substring(0, 1) : "U")
+                                @(userName.Substring(0, 1))
                             </div>
                             <span>@userName</span>
                             <i class="bi bi-chevron-down"></i>
                         </div>
 
                         <div class="dropdown-menu-custom">
-
-                            <a href="#">
-                                <i class="bi bi-person"></i> Profile
-                            </a>
-
+                            <a href="#"><i class="bi bi-person"></i> Profile</a>
                             <a asp-action="Logout" asp-controller="Auth">
                                 <i class="bi bi-box-arrow-right"></i> Logout
                             </a>
-
                         </div>
                     }
                     else
                     {
-                        <a asp-action="Login" asp-controller="Auth" class="btn btn-outline-light btn-sm">
+                        <a asp-action="Login" asp-controller="Auth" class="login-btn">
                             <i class="bi bi-box-arrow-in-right"></i> Login
                         </a>
                     }
@@ -303,26 +298,25 @@
                 }
             });
         });
-                      document.addEventListener("DOMContentLoaded", function () {
+
+               document.addEventListener("DOMContentLoaded", function () {
 
             const trigger = document.querySelector(".user-trigger");
-            const menu = document.querySelector(".dropdown-menu-custom");
 
-            if (!trigger || !menu) return;
+            if (!trigger) return;
 
-            // CLICK ON USER
+            const menu = trigger.nextElementSibling; // 🔥 FIX
+
             trigger.addEventListener("click", function (e) {
-                e.stopPropagation(); // 🔥 MAIN FIX
+                e.stopPropagation();
                 menu.classList.toggle("show");
             });
 
-            // CLICK OUTSIDE
             document.addEventListener("click", function () {
                 menu.classList.remove("show");
             });
 
         });
-
                         // Leads dropdown toggle
             document.querySelectorAll(".menu-toggle").forEach(toggle => {
             toggle.addEventListener("click", (e) => {
