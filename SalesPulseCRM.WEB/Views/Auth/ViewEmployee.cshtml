@@ -1,0 +1,95 @@
+﻿@model List<EmployeeViewModel>
+
+<link href="~/css/AuthController/ViewEmployees.css" rel="stylesheet" />
+
+<div class="mobile-container">
+
+    <!-- HEADER -->
+    <div class="mobile-header">
+        <h5>Employees</h5>
+        <button class="filter-btn">☰</button>
+    </div>
+
+    <!-- SEARCH -->
+    <div class="search-wrapper">
+        <input type="text" id="searchInput" placeholder="Search employee..." />
+    </div>
+
+    <!-- LIST -->
+    <div class="employee-list">
+
+        @foreach (var emp in Model)
+        {
+            <div class="employee-card">
+
+                <div class="left">
+                    <div class="avatar">
+                        @emp.Name.Substring(0, 1)
+                    </div>
+                </div>
+
+                <div class="center">
+                    <div class="name">@emp.Name</div>
+                    <div class="email">@emp.Email</div>
+
+                    <div class="meta">
+                        <span class="role @(emp.Role.ToLower())">@emp.Role</span>
+                        <span class="dot">•</span>
+                        <span class="manager">
+                            @(string.IsNullOrEmpty(emp.ManagerName) ? "No Manager" : emp.ManagerName)
+                        </span>
+                    </div>
+
+                    <!-- 🔥 ACTIONS -->
+                    <div class="card-actions">
+                        <a asp-action="UpdateUser" asp-controller="Auth" asp-route-userId="@emp.UserId" class="btn edit-btn">Edit</a>
+
+                        <form asp-action="DeleteUser" asp-controller="Auth" method="post">
+                            <input type="hidden" name="id" value="@emp.UserId" />
+                            <button type="submit" class="btn delete-btn">Delete</button>
+                        </form>
+                    </div>
+
+                </div>
+
+                <div class="right">
+                    <div class="status @(emp.IsActive ? "active" : "inactive")"></div>
+                </div>
+
+            </div>
+        }
+
+    </div>
+
+</div>
+<script>
+    document.getElementById("searchInput").addEventListener("keyup", function () {
+        let val = this.value.toLowerCase();
+        document.querySelectorAll(".employee-card").forEach(card => {
+            card.style.display = card.innerText.toLowerCase().includes(val)
+                ? "flex"
+                : "none";
+        });
+    });
+
+    function toggleMenu(el, event) {
+        event.stopPropagation(); // 🔥 prevents instant close
+
+        let menu = el.nextElementSibling;
+
+        document.querySelectorAll(".dropdown-menu-custom").forEach(m => {
+            if (m !== menu) m.style.display = "none";
+        });
+
+        menu.style.display = menu.style.display === "flex" ? "none" : "flex";
+    }
+
+    /* CLOSE MENU ON OUTSIDE CLICK */
+    document.addEventListener("click", function (e) {
+        if (!e.target.closest(".actions")) {
+            document.querySelectorAll(".dropdown-menu-custom")
+                .forEach(m => m.style.display = "none");
+        }
+    });
+
+</script>

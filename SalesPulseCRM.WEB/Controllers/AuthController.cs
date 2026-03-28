@@ -168,6 +168,29 @@ namespace SalesPulseCRM.WEB.Controllers
             return RedirectToAction("Register");
         }
 
+
+        [HttpGet]
+        public async Task<IActionResult> ViewEmployee()
+        {
+            var employees = await _db.Users
+                .Where(u => u.Role != "Admin")
+                .Select(u => new EmployeeViewModel
+                {
+                    UserId = u.UserId,
+                    Name = u.Name,
+                    Email = u.Email,
+                    Role = u.Role,
+                    IsActive = u.IsActive,
+
+                    ManagerName = _db.Users
+                    .Where(m => m.UserId == u.ManagerId)
+                    .Select(m => m.Name)
+                    .FirstOrDefault()
+                }).ToListAsync();
+
+            return View(employees);
+        }
+
         [HttpGet]
         public async Task<IActionResult> VerifyEmail(string email, string token)
         {
@@ -248,6 +271,60 @@ namespace SalesPulseCRM.WEB.Controllers
             user.ResetTokenExpiry = null;
             _db.SaveChanges();
             return RedirectToAction("Login", "Auth");
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> UpdateUser(int userId)
+        {
+            var user = await _db.Users.FirstOrDefaultAsync(u => u.UserId == userId);
+
+            if (user == null)
+            {
+                return NotFound();
+            }
+
+
+            var model = new UpdateUserViewModel
+            {
+                UserId = user.UserId,
+                Name = user.Name,
+                Email = user.Email,
+                Phone = user.Phone,
+                Role = user.Role,
+                ManagerId = user.ManagerId,
+
+                Managers = await _db.Users.Where(u => u.Role == "Manager")
+                .ToListAsync()
+            };
+
+            return View(model);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult>UpdateUser(UpdateUserViewModel updateUserView)
+        {
+            if(!ModelState.IsValid)
+            {
+                updateUserView.Managers = await _db.Users.Where(u => u.Role == "Manager").ToListAsync();
+                return View(updateUserView);
+            }
+
+            var user = await _db.Users.FindAsync(updateUserView.UserId);
+
+            if(user == null)
+            {
+                return NotFound();
+            }
+
+            user.Name = updateUserView.Name;
+            user.Email = updateUserView.Email;
+            user.Phone = updateUserView.Phone;
+            user.Role = updateUserView.Role;
+            user.ManagerId = updateUserView.ManagerId;
+            user.IsActive = updateUserView.IsActive;
+
+            await _db.SaveChangesAsync();
+            return RedirectToAction("ViewEmployee");
         }
     }
 }

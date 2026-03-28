@@ -12,5 +12,6 @@ namespace SalesPulseCRM.Domain.Entities
         public string TeamName { get; set; }
         public string ManagerName { get; set; }
         public int MemberCount { get; set; }
+        public List<string> MemberNames { get; set; } = new();
     }
 }

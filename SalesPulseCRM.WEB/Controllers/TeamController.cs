@@ -89,19 +89,27 @@ namespace SalesPulseCRM.WEB.Controllers
                 {
                     TeamId = t.TeamId,
                     TeamName = t.TeamName,
+
                     ManagerName = _db.Users
                         .Where(u => u.UserId == t.ManagerId)
                         .Select(u => u.Name)
                         .FirstOrDefault(),
 
                     MemberCount = _db.TeamMembers
-                        .Count(tm => tm.TeamId == t.TeamId)
+                        .Count(tm => tm.TeamId == t.TeamId),
+
+                    MemberNames = _db.TeamMembers
+                        .Where(tm => tm.TeamId == t.TeamId)
+                        .Join(_db.Users,
+                              tm => tm.UserId,
+                              u => u.UserId,
+                              (tm, u) => u.Name)
+                        .ToList()
                 })
                 .ToListAsync();
 
             return View(teams);
         }
-
 
 
         [HttpGet]

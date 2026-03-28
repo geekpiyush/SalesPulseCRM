@@ -151,3 +151,22 @@ body {
     align-items: center;
     justify-content: center;
 }
+.members {
+    margin-top: 10px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.member-pill {
+    background: rgba(255,255,255,0.08);
+    color: #cbd5f5;
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 11px;
+}
+
+.member-pill.more {
+    background: rgba(59,130,246,0.2);
+    color: #60a5fa;
+}
