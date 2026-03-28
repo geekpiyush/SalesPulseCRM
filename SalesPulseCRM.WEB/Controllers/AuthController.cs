@@ -105,7 +105,13 @@ namespace SalesPulseCRM.WEB.Controllers
             var identity = new ClaimsIdentity(claims, "MyCookieAuth");
             var principal = new ClaimsPrincipal(identity);
 
-            await HttpContext.SignInAsync("MyCookieAuth", principal);
+            var authProperties = new AuthenticationProperties
+            {
+                IsPersistent = true,
+                ExpiresUtc = DateTime.UtcNow.AddDays(7)
+            };
+
+            await HttpContext.SignInAsync("MyCookieAuth", principal,authProperties);
 
             // redirect
             return RedirectToAction("Index", "Home");

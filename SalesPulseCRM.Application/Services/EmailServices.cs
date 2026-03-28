@@ -71,5 +71,40 @@ namespace SalesPulseCRM.Application.Services
             mail.To.Add(toEmail);
             smtpClient.Send(mail);
         }
+
+
+        public void SendTeamAssignedEmail(string toEmail, string userName, string teamName,string managerName )
+        {
+
+            var smtpClient = new SmtpClient("smtp.gmail.com")
+            {
+                Port = 587,
+                Credentials = new NetworkCredential("dpiyush28@gmail.com", "zeopfoujocxhakbp"),
+                EnableSsl = true,
+            };
+
+
+            var subject = "You have been added to a team";
+
+            var body = $@"
+                    Hi {userName}, <br>
+                    You have been added to the team <b>{teamName}<b>.</br>
+                    Your manager is <b>{managerName}</b>.<br><br>
+                    Please login to the CRM to view details. <br> <br>
+                    Regards,<br>
+                    SalesPulseCRM
+                      ";
+
+            var mail = new MailMessage
+            {
+                From = new MailAddress("dpiyush28@gmail.com"),
+                Subject = subject,
+                Body = body,
+                IsBodyHtml = true,
+            };
+
+            mail.To.Add(toEmail);
+            smtpClient.Send(mail);
+        }
     }
 }

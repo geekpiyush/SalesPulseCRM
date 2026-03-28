@@ -38,6 +38,9 @@ builder.Services.AddAuthentication("MyCookieAuth")
     {
         options.LoginPath = "/Auth/Login";
         options.AccessDeniedPath = "/Auth/AccessDenied";
+
+        options.ExpireTimeSpan = TimeSpan.FromDays(7);
+        options.SlidingExpiration = true;
     });
 
 builder.Services.AddScoped<EmailServices>();

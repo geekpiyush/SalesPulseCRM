@@ -1,6 +1,8 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using Hangfire;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using SalesPulseCRM.Application.Services;
 using SalesPulseCRM.Domain.Entities;
 using SalesPulseCRM.Infrastructure.DB;
 
@@ -10,9 +12,11 @@ namespace SalesPulseCRM.WEB.Controllers
     public class TeamController : Controller
     {
         private readonly CrmDbContext _db;
-        public TeamController(CrmDbContext crmDbContext)
+        private readonly EmailServices _emailServices;
+        public TeamController(CrmDbContext crmDbContext, EmailServices emailServices)
         {
             _db = crmDbContext;
+            _emailServices = emailServices;
         }
 
         [HttpGet]
@@ -175,6 +179,10 @@ namespace SalesPulseCRM.WEB.Controllers
 
             _db.TeamMembers.RemoveRange(toRemove);
 
+            var newUserId = userIds
+                .Where(teamId => !existingIds.Contains(teamId)).ToList();
+
+
             // 🔥 ADD new users only
             var toAdd = userIds
                 .Where(id => !existingIds.Contains(id))
@@ -186,6 +194,21 @@ namespace SalesPulseCRM.WEB.Controllers
 
             await _db.TeamMembers.AddRangeAsync(toAdd);
             await _db.SaveChangesAsync();
+
+            var newUser =await _db.Users.Where(u => newUserId.Contains(u.UserId)).ToListAsync();
+            var manager = await _db.Users.FindAsync(team.ManagerId);
+
+            foreach(var user in newUser)
+            {
+                BackgroundJob.Enqueue(() =>
+                _emailServices.SendTeamAssignedEmail
+                (
+                    user.Email,
+                    user.Name,
+                    team.TeamName,
+                    manager.Name
+                ));
+            }
 
             TempData["Success"] = "Team updated successfully";
 
