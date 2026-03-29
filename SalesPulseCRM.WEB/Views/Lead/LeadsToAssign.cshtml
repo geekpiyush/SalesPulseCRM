@@ -105,6 +105,44 @@
         </div>
     </div>
 </div>
+
+<div class="mobile-leads d-md-none">
+
+    @foreach (var lead in Model)
+    {
+        <div class="lead-card">
+
+            <div class="lead-top">
+                <div class="lead-name">@lead.CustomerName</div>
+                <span class="badge status-@lead.LeadStatus?.StatusName?.ToLower()">
+                    @lead.LeadStatus?.StatusName
+                </span>
+            </div>
+
+            <div class="lead-info">
+                <div><b>Project:</b> @lead.Project?.ProjectName</div>
+                <div><b>City:</b> @lead.City?.CityName</div>
+                <div><b>Date:</b> @lead.CreatedDate.ToString("dd MMM yyyy")</div>
+            </div>
+
+            <div class="lead-actions">
+
+                <button class="btn-action assign-btn"
+                        onclick="openAssignModal('@lead.LeadId')">
+                    <i class="bi bi-person-plus"></i>
+                </button>
+
+                <input type="checkbox"
+                       class="lead-checkbox"
+                       value="@lead.LeadId" />
+
+            </div>
+
+        </div>
+    }
+
+</div>
+
 <div id="successToast" class="custom-toast">
     <i class="bi bi-check-circle"></i>
     <span id="toastMessage"></span>
