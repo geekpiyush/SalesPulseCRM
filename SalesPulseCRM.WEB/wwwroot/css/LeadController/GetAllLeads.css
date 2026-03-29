@@ -1,7 +1,7 @@
 ﻿.lead-filter-bar {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 12px;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
     background: #020617;
     padding: 12px;
     border-radius: 14px;
@@ -13,11 +13,10 @@
         background: #0f172a;
         color: #fff;
         border: 1px solid #1e293b;
-        padding: 10px 12px;
+        padding: 10px;
         border-radius: 10px;
         font-size: 13px;
-        min-width: 140px;
-        transition: 0.2s;
+        width: 100%;
     }
         .lead-filter-bar input:focus,
         .lead-filter-bar select:focus {
@@ -25,11 +24,7 @@
             box-shadow: 0 0 8px rgba(59,130,246,0.3);
         }
 .date-filter {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    color: #94a3b8;
-    font-size: 12px;
+    display: contents;
 }
 #leadContainer {
     row-gap: 20px;
@@ -194,7 +189,7 @@
     }
 @media (max-width: 768px) {
     .lead-filter-bar {
-        flex-direction: column;
+        grid-template-columns: 1fr 1fr;
     }
 
         .lead-filter-bar input,
@@ -203,7 +198,41 @@
         }
 
     .date-filter {
-        flex-direction: column;
-        align-items: flex-start;
+        grid-column: span 2;
+        display: flex;
+        gap: 6px;
+    }
+        .date-filter input {
+            flex: 1;
+        }
+    #leadContainer .col-6 {
+        padding: 6px;
+    }
+    .lead-card {
+        padding: 12px;
+        border-radius: 14px;
+    }
+    .lead-name {
+        font-size: 13px;
+    }
+
+    .lead-email {
+        font-size: 11px;
+    }
+
+    .lead-row {
+        font-size: 11px;
+    }
+
+    .lead-avatar {
+        width: 34px;
+        height: 34px;
+        font-size: 13px;
+    }
+
+    /* BUTTON */
+    .btn-edit {
+        font-size: 11px;
+        padding: 5px 10px;
     }
 }

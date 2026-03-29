@@ -56,7 +56,7 @@
         {
             var status = lead.LeadType?.ToLower() ?? "new";
 
-            <div class="col-12 col-md-6 col-xl-4 lead-card-wrapper"
+            <div class="col-6 col-md-6 col-xl-4 lead-card-wrapper"
                  data-status="@lead.LeadType?.ToLower()"
                  data-project="@lead.ProjectId"
                  data-date="@lead.CreatedDate.ToString("yyyy-MM-dd")" data-city="@lead.CityName?.ToLower()">
