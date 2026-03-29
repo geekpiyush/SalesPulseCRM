@@ -4,165 +4,101 @@
     ViewBag.Title = "Leads";
 }
 
-<link href="~/css/LeadController/GetAllLeads.css" rel="stylesheet" />
+<!-- ✅ DATATABLE CSS -->
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css" />
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+<link href="~/css/LeadController/GetAllLeads.css" rel="stylesheet" asp-append-version="true"/>
 
 <div class="container-fluid py-3">
 
-    <!-- 🔍 FILTER BAR -->
-    <div class="lead-filter-bar">
+    <div class="table-responsive">
+        <table id="leadTable" class=" table-hover align-middle w-100">
+            <thead class="table-light">
+                <tr>
+                    <th>Name</th>
+                    <th>Phone</th>
+                    <th>City</th>
+                    <th>Project</th>
+                    <th>Status</th>
+                    <th>Date</th>
+                    <th style="width:120px;">Action</th>
+                </tr>
 
-        <input type="text" id="searchInput" placeholder="Search leads..." />
+            </thead>
 
-        <select id="statusFilter">
-            <option value="">Status</option>
-            @foreach (var s in ViewBag.LeadStatus)
-            {
-                <option value="@s.StatusName">@s.StatusName</option>
-            }
-        </select>
+            <tbody>
+                @foreach (var lead in Model)
+                {
+                    <tr>
+                        <td class="fw-semibold">@lead.CustomerName</td>
 
-        <select id="projectFilter">
-            <option value="">Project</option>
-            @foreach (var project in ViewBag.Projects)
-            {
-                <option value="@project.ProjectId">
-                    @project.ProjectName (@project.Location)
-                </option>
-            }
-        </select>
+                        <td>
+                           @lead.Phone
+                        </td>
 
-        <select id="cityFilter">
-            <option value="">City</option>
-            @foreach (var c in Model
-                        .Where(x => !string.IsNullOrEmpty(x.CityName))
-                        .Select(x => x.CityName)
-                        .Distinct())
-            {
-                <option value="@c">@c</option>
-            }
-        </select>
-        <div class="date-filter">
-            <span>From:</span>
-            <input type="date" id="fromDate" />
-            <span>To:</span>
-            <input type="date" id="toDate" />
-        </div>
-    </div>
+                        <td>@lead.CityName</td>
 
-    <!-- 📦 LEADS -->
-    <div class="row" id="leadContainer">
+                        <td>@lead.ProjectName</td>
 
-        @foreach (var lead in Model ?? new List<SalesPulseCRM.Application.DTOs.LeadResponseDto>())
-        {
-            var status = lead.LeadType?.ToLower() ?? "new";
+                        <td>
+                            <span class="badge status-@lead.LeadType?.ToLower()">
+                                @lead.LeadType
+                            </span>
+                        </td>
 
-            <div class="col-6 col-md-6 col-xl-4 lead-card-wrapper"
-                 data-status="@lead.LeadType?.ToLower()"
-                 data-project="@lead.ProjectId"
-                 data-date="@lead.CreatedDate.ToString("yyyy-MM-dd")" data-city="@lead.CityName?.ToLower()">
+                        <td>@lead.CreatedDate.ToString("dd MMM yyyy")</td>
+                        <td class="d-flex gap-2">
 
-                <div class="lead-card">
-
-                    <!-- HEADER -->
-                    <div class="lead-top">
-
-                        <div class="d-flex align-items-center gap-3">
-                            <div class="lead-avatar">
-                                @lead.CustomerName.Substring(0, 1)
-                            </div>
-
-                            <div>
-                                <div class="lead-name">@lead.CustomerName</div>
-                                <div class="lead-email">@lead.Email</div>
-                            </div>
-                        </div>
-
-                        <span class="lead-status @status">
-                            @(lead.LeadType ?? "New")
-                        </span>
-
-                    </div>
-
-                    <!-- BODY -->
-                    <div class="lead-body">
-
-                        <div class="lead-row">
-                            <a href="tel:@lead.Phone" class="lead-phone">
-                                📞 @lead.Phone
+                            <!-- CALL -->
+                            <a href="tel:@lead.Phone" class="btn-action call-btn" title="Call">
+                                <i class="bi bi-telephone"></i>
                             </a>
-                            <span>🏙 @(lead.CityName ?? "-")</span>
-                        </div>
 
-                        <div class="lead-row">
-                            <span>🏢 @(lead.ProjectName ?? "-")</span>
-                            <span>📅 @lead.CreatedDate.ToString("dd MMM yyyy")</span>
-                        </div>
+                            <!-- WHATSAPP -->
+                            <a href="https://wa.me/@lead.Phone" target="_blank" class="btn-action whatsapp-btn" title="WhatsApp">
+                                <i class="bi bi-whatsapp"></i>
+                            </a>
 
-                    </div>
+                            <!-- EDIT -->
+                            <button class="btn-action edit-btn" title="Edit">
+                                <i class="bi bi-pencil"></i>
+                            </button>
 
-                    <!-- ACTIONS -->
-                    <div class="lead-actions">
-                        <button class="btn-edit">Edit</button>
-                    </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
 
-                </div>
-
-            </div>
-        }
-
+        </table>
     </div>
 
 </div>
+
+<!-- ✅ jQuery (required) -->
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+
+<!-- ✅ DataTables -->
+<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
+
+<!-- ✅ INIT -->
 <script>
-    const search = document.getElementById("searchInput");
-    const statusFilter = document.getElementById("statusFilter");
-    const projectFilter = document.getElementById("projectFilter");
-    const fromDate = document.getElementById("fromDate");
-    const toDate = document.getElementById("toDate");
-    const cityFilter = document.getElementById("cityFilter");
-
-    function filterLeads() {
-        let searchValue = search.value.toLowerCase();
-        let statusValue = statusFilter.value.toLowerCase();
-        let projectValue = projectFilter.value;
-        let cityValue = cityFilter.value.toLowerCase();
-
-        let from = fromDate.value ? new Date(fromDate.value) : null;
-        let to = toDate.value ? new Date(toDate.value) : null;
-
-        document.querySelectorAll(".lead-card-wrapper").forEach(card => {
-
-            let text = card.innerText.toLowerCase();
-            let status = (card.dataset.status || "").toLowerCase();
-            let project = card.dataset.project || "";
-            let city = (card.dataset.city || "").toLowerCase();
-            let dateStr = card.dataset.date;
-
-            let cardDate = dateStr ? new Date(dateStr) : null;
-
-            let matchSearch = text.includes(searchValue);
-            let matchStatus = !statusValue || status.includes(statusValue);
-            let matchProject = !projectValue || project == projectValue;
-            let matchCity = !cityValue || city.includes(cityValue);
-
-            let matchDate = true;
-            if (cardDate) {
-                if (from && cardDate < from) matchDate = false;
-                if (to && cardDate > to) matchDate = false;
+    $(document).ready(function () {
+        $('#leadTable').DataTable({
+            responsive: true,
+            pageLength: 10,
+            lengthMenu: [10, 25, 50, 100],
+            ordering: true,
+            autoWidth: false,
+            language: {
+                search: "Search:",
+                lengthMenu: "Show _MENU_ entries",
+                info: "Showing _START_ to _END_ of _TOTAL_ leads",
+                paginate: {
+                    next: "→",
+                    previous: "←"
+                }
             }
-
-            card.style.display =
-                (matchSearch && matchStatus && matchProject && matchCity && matchDate)
-                    ? ""
-                    : "none";
         });
-    }
-
-    // EVENTS
-    search.addEventListener("keyup", filterLeads);
-    statusFilter.addEventListener("change", filterLeads);
-    projectFilter.addEventListener("change", filterLeads);
-    cityFilter.addEventListener("change", filterLeads);
-    fromDate.addEventListener("change", filterLeads);
-    toDate.addEventListener("change", filterLeads);
+    });
 </script>

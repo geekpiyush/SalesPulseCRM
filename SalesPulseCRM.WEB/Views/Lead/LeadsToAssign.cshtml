@@ -1,0 +1,242 @@
+﻿@model List<SalesPulseCRM.Domain.Entities.Lead>
+
+@{
+    ViewBag.Title = "New Leads";
+}
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet" />
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<link href="~/css/LeadController/LeadsToAssign.css" rel="stylesheet" asp-append-version="true"/>
+
+<div class="container-fluid py-3">
+
+    <div class="card-clean">
+
+        <h5 class="mb-3">New Leads (Unassigned)</h5>
+
+        <button class="btn btn-primary mb-3" onclick="openBulkAssign()">
+            Assign Selected
+        </button>
+
+        <div class="table-responsive">
+            <table id="leadTable" class="w-100 align-middle">
+
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Project</th>
+                        <th>City</th>
+                        <th>Date</th>
+                        <th>Status</th>
+                        <th style="width:120px;">Assign</th>
+                        <th>
+                            Select All <input type="checkbox" id="selectAll" />
+                        </th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    @foreach (var lead in Model)
+                    {
+                        <tr>
+                            <td class="fw-semibold">@lead.CustomerName</td>
+
+                            <td>@lead.Project?.ProjectName</td>
+
+                            <td>@lead.City?.CityName</td>
+
+                            <td>@lead.CreatedDate.ToString("dd MMM yyyy")</td>
+
+                            <td>
+                                <span class="badge status-@lead.LeadStatus?.StatusName?.ToLower()">
+                                    @lead.LeadStatus?.StatusName
+                                </span>
+                            </td>
+
+                            <td>
+                                <button class="btn-action assign-btn"
+                                        onclick="openAssignModal('@lead.LeadId')">
+                                    <i class="bi bi-person-plus"></i>
+                                </button>
+                            </td>
+                            <td>
+                                <input type="checkbox" class="lead-checkbox" value="@lead.LeadId" />
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+
+            </table>
+        </div>
+
+    </div>
+
+</div>
+<div class="modal fade" id="assignModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content bg-dark text-light border border-secondary">
+
+            <div class="modal-header">
+                <h5 class="modal-title">Assign Lead</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+
+            <div class="modal-body">
+
+                <input type="hidden" id="assignLeadId" />
+
+                <label>Select Employee</label>
+                <select id="employeeSelect" class="form-select bg-dark text-light border-secondary">
+                    <option value="">Select</option>
+
+                    @foreach (var user in ViewBag.Employees)
+                    {
+                        <option value="@user.UserId">@user.Name</option>
+                    }
+                </select>
+
+            </div>
+
+            <div class="modal-footer">
+                <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button class="btn btn-primary" onclick="assignLead()">Assign</button>
+            </div>
+
+        </div>
+    </div>
+</div>
+<div id="successToast" class="custom-toast">
+    <i class="bi bi-check-circle"></i>
+    <span id="toastMessage"></span>
+</div>
+<script>
+
+    let assignModal;
+    let selectedLeads = [];
+
+    document.addEventListener("DOMContentLoaded", function () {
+
+        assignModal = new bootstrap.Modal(document.getElementById('assignModal'));
+
+        // ✅ Select All
+        const selectAll = document.getElementById("selectAll");
+        if (selectAll) {
+            selectAll.addEventListener("change", function () {
+                document.querySelectorAll(".lead-checkbox").forEach(cb => {
+                    cb.checked = this.checked;
+                });
+            });
+        }
+    });
+
+    // 🔥 SINGLE ASSIGN
+    function openAssignModal(leadId) {
+        selectedLeads = [leadId];
+        assignModal.show();
+    }
+
+    // 🔥 BULK ASSIGN
+    function openBulkAssign() {
+
+        selectedLeads = [];
+
+        document.querySelectorAll(".lead-checkbox:checked").forEach(cb => {
+            selectedLeads.push(parseInt(cb.value));
+        });
+
+        if (selectedLeads.length === 0) {
+            showToast("⚠️ Select at least one lead", true);
+            return;
+        }
+
+        assignModal.show();
+    }
+
+    // 🔥 TOAST FUNCTION
+    function showToast(message, isError = false) {
+
+        let toast = document.getElementById("successToast");
+        let text = document.getElementById("toastMessage");
+
+        text.innerText = message;
+
+        toast.style.borderColor = isError ? "#ef4444" : "#22c55e";
+        toast.querySelector("i").style.color = isError ? "#ef4444" : "#22c55e";
+
+        toast.classList.add("show");
+
+        setTimeout(() => {
+            toast.classList.remove("show");
+        }, 3000);
+    }
+
+    // 🔥 ASSIGN FUNCTION
+    function assignLead() {
+
+        let userId = document.getElementById("employeeSelect").value;
+
+        if (!userId) {
+            showToast("⚠️ Select employee", true);
+            return;
+        }
+
+        if (selectedLeads.length === 0) {
+            showToast("⚠️ No leads selected", true);
+            return;
+        }
+
+        let url = selectedLeads.length === 1
+            ? '/Lead/AssignLead'
+            : '/Lead/BulkAssignLead';
+
+        let payload = selectedLeads.length === 1
+            ? {
+                leadId: selectedLeads[0],
+                userId: parseInt(userId)
+            }
+            : {
+                leadIds: selectedLeads,
+                userId: parseInt(userId)
+            };
+
+        fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(payload)
+        })
+        .then(res => {
+
+            if (res.ok) {
+
+                assignModal.hide();
+
+                let count = selectedLeads.length;
+
+                showToast(
+                    count === 1
+                        ? "✅ Lead assigned successfully"
+                        : `✅ ${count} leads assigned successfully`
+                );
+
+                // 🔥 REMOVE ROWS (NO RELOAD UX)
+                selectedLeads.forEach(id => {
+                    let row = document.querySelector(`.lead-checkbox[value="${id}"]`)?.closest("tr");
+                    if (row) row.remove();
+                });
+
+                selectedLeads = [];
+
+            } else {
+                showToast("❌ Error assigning lead", true);
+            }
+
+        })
+        .catch(err => {
+            console.error(err);
+            showToast("❌ Something went wrong", true);
+        });
+    }
+
+</script>

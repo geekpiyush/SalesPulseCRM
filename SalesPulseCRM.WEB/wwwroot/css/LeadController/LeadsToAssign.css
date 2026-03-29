@@ -1,0 +1,86 @@
+﻿.card-clean {
+    background: #111827;
+    border: 1px solid #1f2937;
+    border-radius: 12px;
+    padding: 16px;
+}
+
+table {
+    color: #e5e7eb;
+    width: 100%;
+}
+
+thead {
+    background: #0f172a;
+}
+
+th {
+    color: #9ca3af;
+    padding: 10px;
+}
+
+td {
+    padding: 12px;
+    border-bottom: 1px solid #1f2937;
+}
+
+tr:hover {
+    background: #1f2937;
+}
+
+/* BUTTON */
+.btn-action {
+    width: 34px;
+    height: 34px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid #374151;
+    background: #020617;
+    color: #9ca3af;
+}
+
+.assign-btn:hover {
+    background: rgba(168,85,247,0.15);
+    color: #a855f7;
+    border-color: #a855f7;
+}
+
+/* STATUS */
+.badge {
+    padding: 5px 10px;
+    border-radius: 8px;
+    font-size: 12px;
+}
+
+.status-new {
+    background: rgba(59,130,246,0.2);
+    color: #3b82f6;
+}
+.custom-toast {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: #111827;
+    color: #e5e7eb;
+    padding: 12px 18px;
+    border-radius: 10px;
+    border: 1px solid #1f2937;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    opacity: 0;
+    transform: translateY(-10px);
+    transition: 0.3s ease;
+    z-index: 9999;
+}
+
+    .custom-toast.show {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    .custom-toast i {
+        color: #22c55e;
+    }

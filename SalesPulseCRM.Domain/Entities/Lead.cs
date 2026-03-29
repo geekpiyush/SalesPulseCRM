@@ -31,6 +31,9 @@ public class Lead
     public State? State { get; set; }
     public City? City { get; set; }
     public Project? Project { get; set; }
+    public int? CurrentAssignedTo { get; set; }
+    public int? CurrentAssignedBy { get; set; }
+    public DateTime? CurrentAssignedDate { get; set; }
 
     public ICollection<LeadAssignment> Assignments { get; set; } = new List<LeadAssignment>();
     public ICollection<LeadNote> Notes { get; set; } = new List<LeadNote>();
