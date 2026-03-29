@@ -24,6 +24,7 @@
                 <thead>
                     <tr>
                         <th>Name</th>
+                        <th>Phone</th>
                         <th>Project</th>
                         <th>City</th>
                         <th>Date</th>
@@ -40,7 +41,7 @@
                     {
                         <tr>
                             <td class="fw-semibold">@lead.CustomerName</td>
-
+                            <td class="fw-semibold">@lead.Phone</td>
                             <td>@lead.Project?.ProjectName</td>
 
                             <td>@lead.City?.CityName</td>
@@ -120,6 +121,7 @@
             </div>
 
             <div class="lead-info">
+                <div><b>Phone:</b> @lead.Phone</div>
                 <div><b>Project:</b> @lead.Project?.ProjectName</div>
                 <div><b>City:</b> @lead.City?.CityName</div>
                 <div><b>Date:</b> @lead.CreatedDate.ToString("dd MMM yyyy")</div>
