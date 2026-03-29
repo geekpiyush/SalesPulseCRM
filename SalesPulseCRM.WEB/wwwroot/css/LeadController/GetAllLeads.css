@@ -228,6 +228,9 @@ a[href^="tel"] {
 /* MOBILE */
 @media (max-width: 768px) {
 
+    #leadTable_wrapper {
+        display: none;
+    }
     /* Hide low priority columns */
     #leadTable th:nth-child(3),
     #leadTable td:nth-child(3),
@@ -280,3 +283,49 @@ a[href^="tel"] {
 }
 
 
+/* ================= MOBILE CARDS ================= */
+
+.lead-cards {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.lead-card {
+    background: #111827;
+    border: 1px solid #1f2937;
+    border-radius: 12px;
+    padding: 14px;
+    transition: 0.2s;
+}
+
+    .lead-card:hover {
+        background: #1f2937;
+    }
+
+/* HEADER */
+.lead-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+    .lead-header h6 {
+        margin: 0;
+        font-weight: 600;
+    }
+
+/* BODY */
+.lead-body p {
+    margin: 4px 0;
+    font-size: 13px;
+    color: #9ca3af;
+}
+
+/* ACTIONS */
+.lead-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+}

@@ -74,6 +74,45 @@
 
 </div>
 
+<!-- ✅ MOBILE CARDS -->
+<div class="lead-cards d-md-none">
+    @foreach (var lead in Model)
+    {
+        <div class="lead-card">
+            <div class="lead-header">
+                <h6>@lead.CustomerName</h6>
+                <span class="badge status-@lead.LeadType?.ToLower()">
+                    @lead.LeadType
+                </span>
+            </div>
+
+            <div class="lead-body">
+                <p><i class="bi bi-telephone"></i> @lead.Phone</p>
+                <p><i class="bi bi-geo-alt"></i> @lead.CityName</p>
+                <p><i class="bi bi-building"></i> @lead.ProjectName</p>
+                <p class="text-muted">
+                    <i class="bi bi-calendar"></i>
+                    @lead.CreatedDate.ToString("dd MMM yyyy")
+                </p>
+            </div>
+
+            <div class="lead-actions">
+                <a href="tel:@lead.Phone" class="btn-action call-btn">
+                    <i class="bi bi-telephone"></i>
+                </a>
+
+                <a href="https://wa.me/@lead.Phone" target="_blank" class="btn-action whatsapp-btn">
+                    <i class="bi bi-whatsapp"></i>
+                </a>
+
+                <button class="btn-action edit-btn">
+                    <i class="bi bi-pencil"></i>
+                </button>
+            </div>
+        </div>
+    }
+</div>
+
 <!-- ✅ jQuery (required) -->
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 
