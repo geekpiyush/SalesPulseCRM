@@ -196,66 +196,18 @@
             </div>
 
             
-            <div class="timeline-tabs">
+        @*     <div class="timeline-tabs">
 
                 <button class="tab active" data-type="all">All</button>
                 <button class="tab" data-type="note">Notes</button>
                 <button class="tab" data-type="followup">Followups</button>
                 <button class="tab" data-type="assignment">Assignments</button>
 
+            </div> *@
+
+            <div id="leadTimelineContainer">
+                @await Html.PartialAsync("_LeadTimeLine", Model.Timeline)
             </div>
-
-            <!-- 🔥 TIMELINE -->
-            <div class="crm-timeline">
-
-                @foreach (var item in Model.Timeline)
-                {
-                    var type = item.Type.ToLower();
-
-                    string icon = type switch
-                    {
-                        "note" => "bi-chat-left-text",
-                        "followup" => "bi-clock-history",
-                        "assignment" => "bi-person-check",
-                        _ => "bi-circle"
-                    };
-
-                    string color = type switch
-                    {
-                        "note" => "note",
-                        "followup" => "followup",
-                        "assignment" => "assignment",
-                        _ => "default"
-                    };
-
-                    <div class="crm-timeline-item @color" data-type="@type">
-
-                        <div class="crm-timeline-icon">
-                            <i class="bi @icon"></i>
-                        </div>
-
-                        <div class="crm-timeline-body">
-
-                            <div class="crm-timeline-header">
-                                <span class="title">@item.Title</span>
-                                <span class="time">@GetTimeAgo(item.Date)</span>
-                            </div>
-
-                            <div class="crm-timeline-desc">
-                                @item.Description
-                            </div>
-
-                            <div class="crm-timeline-meta">
-                                <i class="bi bi-person"></i> @item.UserName
-                                • @item.Date.ToString("dd MMM yyyy, hh:mm tt")
-                            </div>
-
-                        </div>
-                    </div>
-                }
-
-            </div>
-
         </div>
 
     </div>
@@ -301,28 +253,27 @@
      // run on change
      meetingSelect.addEventListener('change', toggleMeeting);
 
-    const tabs = document.querySelectorAll(".timeline-tabs .tab");
-    const items = document.querySelectorAll(".crm-timeline-item");
+         document.addEventListener("click", function (e) {
 
-    tabs.forEach(tab => {
-        tab.addEventListener("click", () => {
+        const tab = e.target.closest(".timeline-tabs .tab");
+        if (!tab) return;
 
-            // remove active
-            tabs.forEach(t => t.classList.remove("active"));
-            tab.classList.add("active");
+        const wrapper = tab.closest(".timeline-wrapper");
+        if (!wrapper) return;
 
-            const type = tab.getAttribute("data-type");
+        const tabs = wrapper.querySelectorAll(".tab");
+        const items = wrapper.querySelectorAll(".crm-timeline-item");
 
-            items.forEach(item => {
-                if (type === "all") {
-                    item.style.display = "flex";
-                } else {
-                    item.style.display =
-                        item.getAttribute("data-type") === type
-                            ? "flex"
-                            : "none";
-                }
-            });
+        tabs.forEach(t => t.classList.remove("active"));
+        tab.classList.add("active");
+
+        const type = tab.dataset.type;
+
+        items.forEach(item => {
+            item.style.display =
+                (type === "all" || item.dataset.type === type)
+                    ? "flex"
+                    : "none";
         });
     });
 
