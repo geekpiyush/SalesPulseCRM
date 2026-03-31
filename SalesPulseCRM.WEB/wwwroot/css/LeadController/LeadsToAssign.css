@@ -8,6 +8,7 @@
 table {
     color: #e5e7eb;
     width: 100%;
+    font-size: 13px
 }
 
 thead {
@@ -15,24 +16,33 @@ thead {
 }
 
 th {
-    color: #9ca3af;
+    color: #6b7280; /* softer */
     padding: 10px;
+    font-size: 12px;
+    font-weight: 500; /* remove heavy bold */
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
 }
 
 td {
-    padding: 12px;
+    padding: 10px;
     border-bottom: 1px solid #1f2937;
-}
+    font-weight: 400;
 
+}
+    td.fw-semibold {
+        font-weight: 500 !important; /* only slight emphasis */
+    }
 tr:hover {
-    background: #1f2937;
+    background: rgba(31, 41, 55, 0.6);
 }
 
 /* BUTTON */
 .btn-action {
-    width: 34px;
-    height: 34px;
-    border-radius: 8px;
+    width: 30px;
+    height: 30px;
+    border-radius: 6px;
+    font-size:13px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -40,13 +50,53 @@ tr:hover {
     background: #020617;
     color: #9ca3af;
 }
+#assignModal .modal-dialog {
+    max-width: 380px; /* 🔥 smaller */
+}
 
+#assignModal .modal-content {
+    border-radius: 10px;
+    padding: 8px;
+}
+
+#assignModal .modal-header {
+    padding: 10px 14px;
+}
+
+#assignModal .modal-body {
+    padding: 12px 14px;
+}
+
+#assignModal .modal-footer {
+    padding: 10px 14px;
+}
+
+#assignModal label {
+    font-size: 12px;
+    color: #9ca3af;
+    margin-bottom: 4px;
+}
+
+#employeeSelect {
+    font-size: 13px;
+    padding: 6px 8px;
+}
+.assign-selected-btn,
+.btn-primary {
+    font-size: 13px;
+    padding: 6px 12px;
+    border-radius: 8px;
+}
 .assign-btn:hover {
     background: rgba(168,85,247,0.15);
     color: #a855f7;
     border-color: #a855f7;
 }
-
+.action-cell {
+    display: flex;
+    align-items: center;
+    gap: 8px; /* space between button & checkbox */
+}
 /* STATUS */
 .badge {
     padding: 5px 10px;
@@ -142,4 +192,33 @@ tr:hover {
         width: 34px;
         height: 34px;
     }
+    .lead-actions {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+        margin-top: 12px;
+    }
+
+        .lead-actions .btn-action {
+            flex: 1;
+            height: 38px;
+            border-radius: 10px;
+        }
+
+            .lead-actions .btn-action i {
+                font-size: 16px;
+            }
+
+    /* checkbox styling */
+    .lead-check {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 40px;
+    }
+
+        .lead-check input {
+            width: 18px;
+            height: 18px;
+        }
 }

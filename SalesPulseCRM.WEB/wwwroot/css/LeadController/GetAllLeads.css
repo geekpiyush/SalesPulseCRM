@@ -30,17 +30,24 @@ table.dataTable {
 
         table.dataTable thead th {
             color: #9ca3af !important;
-            font-weight: 600;
-            border-bottom: 1px solid #1f2937 !important;
-            padding: 12px;
+            font-size: 13px;
+            letter-spacing: 0.3px;
         }
 
     /* BODY */
     table.dataTable tbody tr {
-        background: #111827;
-        border-bottom: 1px solid #1f2937;
+        height: 58px;
     }
-
+    table.dataTable tbody td {
+        font-size: 14px;
+    }
+td.fw-semibold {
+    font-size: 14px;
+    color: #ffffff;
+}
+table.dataTable tbody td:not(.fw-semibold) {
+    color: #cbd5f5;
+}
         table.dataTable tbody tr:nth-child(even) {
             background: #0b1220;
         }
@@ -55,7 +62,12 @@ table.dataTable {
         color: #e5e7eb;
         vertical-align: middle;
     }
-
+/* TIMELINE */
+.timeline-btn:hover {
+    background: rgba(245,158,11,0.15);
+    color: #f59e0b;
+    border-color: #f59e0b;
+}
 /* ================= TEXT ================= */
 .text-muted {
     color: #6b7280 !important;
@@ -69,12 +81,15 @@ a[href^="tel"] {
 
 /* ================= BADGES ================= */
 .badge {
-    font-weight: 500;
-    padding: 5px 10px;
-    border-radius: 8px;
-    font-size: 12px;
+    display: inline-flex;
+    flex-direction: column;
+    align-items: flex-start;
+    line-height: 1.2;
+    padding: 6px 10px;
 }
-
+    .badge small {
+        font-size: 10px;
+    }
 .status-hot {
     background: rgba(239,68,68,0.15);
     color: #f87171;
@@ -224,6 +239,19 @@ a[href^="tel"] {
     padding: 4px;
     font-size: 12px;
 }
+.timeline-wrapper {
+    max-height: 60vh;
+    overflow-y: auto;
+    padding-right: 4px;
+}
+
+.crm-timeline-item {
+    align-items: flex-start;
+}
+
+.crm-timeline-icon {
+    min-width: 28px;
+}
 
 /* MOBILE */
 @media (max-width: 768px) {
@@ -262,8 +290,8 @@ a[href^="tel"] {
         flex-direction: column;
         align-items: flex-start;
         gap: 8px;
-
     }
+
     .btn-action {
         width: 30px;
         height: 30px;
@@ -272,6 +300,7 @@ a[href^="tel"] {
         .btn-action i {
             font-size: 12px;
         }
+
     .filter-select {
         font-size: 11px;
         padding: 3px;
@@ -280,7 +309,76 @@ a[href^="tel"] {
     .filter-row {
         display: none; /* 👉 hide on mobile */
     }
+
+    .timeline-wrapper {
+        padding: 10px;
+        max-height: unset;
+    }
+
+    .crm-timeline-item {
+        flex-direction: column;
+        background: #0f172a;
+        border-radius: 12px;
+        padding: 12px;
+        margin-bottom: 10px;
+        border: 1px solid rgba(255,255,255,0.05);
+    }
+
+    .crm-timeline-icon {
+        width: 32px;
+        height: 32px;
+        margin-bottom: 8px;
+        font-size: 14px;
+    }
+
+    .crm-timeline-body {
+        font-size: 13px;
+    }
+
+    .crm-timeline-header {
+        flex-direction: column;
+        gap: 2px;
+    }
+
+        .crm-timeline-header .title {
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .crm-timeline-header .time {
+            font-size: 11px;
+            color: #9ca3af;
+        }
+
+    .crm-timeline-desc {
+        font-size: 13px;
+        margin-top: 4px;
+    }
+
+    .crm-timeline-meta {
+        font-size: 11px;
+        margin-top: 4px;
+    }
+
+    .lead-actions {
+        display: flex;
+        justify-content: space-between;
+        gap: 8px;
+        margin-top: 12px;
+    }
+
+        .lead-actions .btn-action {
+            flex: 1;
+            height: 38px;
+            border-radius: 10px;
+        }
+
+            .lead-actions .btn-action i {
+                font-size: 16px;
+            }
 }
+}
+
 
 
 /* ================= MOBILE CARDS ================= */

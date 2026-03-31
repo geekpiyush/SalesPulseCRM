@@ -12,13 +12,14 @@
 <div class="container-fluid py-3">
 
     <div class="table-responsive">
-        <table id="leadTable" class=" table-hover align-middle w-100">
+        <table id="leadTable" class="w-100 align-middle">
             <thead class="table-light">
                 <tr>
                     <th>Name</th>
                     <th>Phone</th>
                     <th>City</th>
                     <th>Project</th>
+                    <th>Assign To</th>
                     <th>Status</th>
                     <th>Date</th>
                     <th style="width:120px;">Action</th>
@@ -40,6 +41,9 @@
 
                         <td>@lead.ProjectName</td>
 
+                        <td>@lead.CurrentAssignToName</td>
+
+
                         <td>
                             <span class="badge status-@lead.LeadType?.ToLower()">
                                 @lead.LeadType
@@ -47,7 +51,7 @@
                         </td>
 
                         <td>@lead.CreatedDate.ToString("dd MMM yyyy")</td>
-                        <td class="d-flex gap-2">
+                        <td class="d-flex align-items-center gap-2">
 
                             <!-- CALL -->
                             <a href="tel:@lead.Phone" class="btn-action call-btn" title="Call">
@@ -55,14 +59,26 @@
                             </a>
 
                             <!-- WHATSAPP -->
-                            <a href="https://wa.me/@lead.Phone" target="_blank" class="btn-action whatsapp-btn" title="WhatsApp">
+                            <a href="https://wa.me/@lead.Phone" target="_blank"
+                               class="btn-action whatsapp-btn" title="WhatsApp">
                                 <i class="bi bi-whatsapp"></i>
                             </a>
 
-                            <!-- EDIT -->
-                            <button class="btn-action edit-btn" title="Edit">
-                                <i class="bi bi-pencil"></i>
+                            <!-- TIMELINE -->
+                            <button class="btn-action timeline-btn"
+                                    onclick="openTimeline('@lead.LeadId')"
+                                    title="Timeline">
+                                <i class="bi bi-clock-history"></i>
                             </button>
+
+                            <!-- EDIT -->
+                            <a asp-action="LeadUpdate"
+                               asp-controller="Lead"
+                               asp-route-LeadId="@lead.LeadId"
+                               class="btn-action edit-btn"
+                               title="Edit">
+                                <i class="bi bi-pencil"></i>
+                            </a>
 
                         </td>
                     </tr>
@@ -70,6 +86,22 @@
             </tbody>
 
         </table>
+
+        <div class="modal fade" id="timelineModal" tabindex="-1">
+            <div class="modal-dialog modal-fullscreen-md-down modal-lg modal-dialog-scrollable">
+                <div class="modal-content bg-dark text-light border border-secondary">
+
+                    <div class="modal-header">
+                        <h6 class="modal-title">Lead Timeline</h6>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body p-2" id="timelineContent">
+                        <div class="text-center text-muted">Loading...</div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
     </div>
 
 </div>
@@ -81,8 +113,15 @@
         <div class="lead-card">
             <div class="lead-header">
                 <h6>@lead.CustomerName</h6>
+
                 <span class="badge status-@lead.LeadType?.ToLower()">
-                    @lead.LeadType
+                    <div class="fw-semibold">
+                        @(string.IsNullOrEmpty(lead.LeadType) ? "N/A" : lead.LeadType)
+                    </div>
+
+                    <small class="d-block opacity-75">
+                        @(string.IsNullOrEmpty(lead.CurrentAssignToName) ? "Unassigned" : lead.CurrentAssignToName)
+                    </small>
                 </span>
             </div>
 
@@ -90,6 +129,8 @@
                 <p><i class="bi bi-telephone"></i> @lead.Phone</p>
                 <p><i class="bi bi-geo-alt"></i> @lead.CityName</p>
                 <p><i class="bi bi-building"></i> @lead.ProjectName</p>
+              
+
                 <p class="text-muted">
                     <i class="bi bi-calendar"></i>
                     @lead.CreatedDate.ToString("dd MMM yyyy")
@@ -97,17 +138,31 @@
             </div>
 
             <div class="lead-actions">
+
+                <!-- CALL -->
                 <a href="tel:@lead.Phone" class="btn-action call-btn">
                     <i class="bi bi-telephone"></i>
                 </a>
 
+                <!-- WHATSAPP -->
                 <a href="https://wa.me/@lead.Phone" target="_blank" class="btn-action whatsapp-btn">
                     <i class="bi bi-whatsapp"></i>
                 </a>
 
-                <button class="btn-action edit-btn">
-                    <i class="bi bi-pencil"></i>
+                <!-- 🔥 TIMELINE -->
+                <button class="btn-action timeline-btn"
+                        onclick="openTimeline('@lead.LeadId')">
+                    <i class="bi bi-clock-history"></i>
                 </button>
+
+                <!-- EDIT -->
+                <a asp-action="LeadUpdate"
+                   asp-controller="Lead"
+                   asp-route-LeadId="@lead.LeadId"
+                   class="btn-action edit-btn">
+                    <i class="bi bi-pencil"></i>
+                </a>
+
             </div>
         </div>
     }
@@ -139,5 +194,63 @@
                 }
             }
         });
+    });
+    let timelineModal;
+
+    document.addEventListener("DOMContentLoaded", function () {
+        const modalElement = document.getElementById('timelineModal');
+        if (modalElement) {
+            timelineModal = new bootstrap.Modal(modalElement);
+        }
+    });
+
+    // 🔥 MAKE GLOBAL (VERY IMPORTANT)
+    window.openTimeline = function (leadId) {
+
+        if (!timelineModal) {
+            const modalElement = document.getElementById('timelineModal');
+            timelineModal = new bootstrap.Modal(modalElement);
+        }
+
+        timelineModal.show();
+
+        document.getElementById("timelineContent").innerHTML =
+            '<div class="text-center text-muted">Loading...</div>';
+
+        fetch(`/Lead/GetTimelinePartial?leadId=${leadId}`)
+            .then(res => res.text())
+            .then(html => {
+                document.getElementById("timelineContent").innerHTML = html;
+            })
+            .catch(() => {
+                document.getElementById("timelineContent").innerHTML =
+                    '<div class="text-danger text-center">Error loading timeline</div>';
+            });
+    };
+      document.addEventListener("click", function (e) {
+
+        const tab = e.target.closest(".timeline-tabs .tab");
+        if (!tab) return;
+
+        const wrapper = tab.closest(".timeline-wrapper");
+        if (!wrapper) return;
+
+        const tabs = wrapper.querySelectorAll(".tab");
+        const items = wrapper.querySelectorAll(".crm-timeline-item");
+
+        // switch active
+        tabs.forEach(t => t.classList.remove("active"));
+        tab.classList.add("active");
+
+        const type = tab.dataset.type;
+
+        items.forEach(item => {
+            item.style.display =
+                (type === "all" || item.dataset.type === type)
+                    ? "flex"
+                    : "none";
+        });
+
+        console.log("TAB CLICKED:", type); // 🔥 debug
     });
 </script>

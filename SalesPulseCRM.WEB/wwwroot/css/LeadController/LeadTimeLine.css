@@ -1,0 +1,286 @@
+﻿.timeline {
+    position: relative;
+    margin-top: 20px;
+    padding-left: 30px;
+}
+
+    /* Vertical line */
+    .timeline::before {
+        content: "";
+        position: absolute;
+        left: 12px;
+        top: 0;
+        bottom: 0;
+        width: 2px;
+        background: rgba(255,255,255,0.08);
+    }
+
+.crm-timeline-item {
+    position: relative;
+    margin-bottom: 25px;
+    display: flex;
+    gap: 12px;
+}
+
+.crm-timeline-body {
+    background: #0f172a;
+    border: 1px solid rgba(255,255,255,0.05);
+    border-radius: 12px;
+    padding: 12px 14px;
+    width: 100%;
+}
+
+.crm-timeline-header {
+    display: flex;
+    justify-content: space-between;
+    font-weight: 600;
+    margin-bottom: 5px;
+}
+
+.crm-timeline-desc {
+    color: #cbd5f5;
+    font-size: 14px;
+    margin-bottom: 6px;
+}
+
+.crm-timeline-meta {
+    font-size: 12px;
+    color: #64748b;
+}
+/* COLORS */
+.crm-timeline-item.note .crm-timeline-icon {
+    background: #2563eb;
+}
+
+.crm-timeline-item.followup .crm-timeline-icon {
+    background: #f59e0b;
+}
+
+.crm-timeline-item.assignment .crm-timeline-icon {
+    background: #a855f7;
+}
+
+
+/* Items */
+.timeline-item {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 16px;
+}
+
+/* Dot */
+.timeline .dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    margin-top: 6px;
+}
+
+/* Dot Colors */
+.dot.note {
+    background: #38bdf8;
+}
+
+.dot.followup {
+    background: #f59e0b;
+}
+
+.dot.meeting {
+    background: #22c55e;
+}
+
+.dot.status {
+    background: #a855f7;
+}
+
+.dot.note {
+    background: blue;
+}
+
+.dot.followup {
+    background: orange;
+}
+
+.dot.meeting {
+    background: green;
+}
+
+.dot.status {
+    background: red;
+}
+
+.dot.assignment {
+    background: purple;
+}
+/* Content */
+.timeline-content {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.05);
+    padding: 10px 12px;
+    border-radius: 10px;
+    width: 100%;
+}
+
+/* Text */
+.timeline-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: #e2e8f0;
+}
+
+.timeline-desc {
+    font-size: 13px;
+    color: #cbd5f5;
+    margin-top: 2px;
+}
+
+.timeline-date {
+    font-size: 11px;
+    color: #64748b;
+    margin-top: 4px;
+}
+
+/* Button */
+.timeline-toggle-btn {
+    background: transparent;
+    border: 1px solid rgba(255,255,255,0.1);
+    color: #cbd5f5;
+    font-size: 12px;
+    padding: 4px 10px;
+    border-radius: 20px;
+    cursor: pointer;
+}
+
+    .timeline-toggle-btn:hover {
+        background: rgba(255,255,255,0.05);
+    }
+
+.timeline-tabs {
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    padding-bottom: 10px;
+    margin-bottom: 10px;
+}
+
+    .timeline-tabs::-webkit-scrollbar {
+        display: none;
+    }
+
+    .timeline-tabs .tab {
+        padding: 6px 14px;
+        border-radius: 20px;
+        border: 1px solid rgba(255,255,255,0.08);
+        background: #0f172a;
+        color: #cbd5f5;
+        white-space: nowrap;
+        cursor: pointer;
+        transition: 0.2s;
+    }
+
+        .timeline-tabs .tab.active {
+            background: #2563eb;
+            color: #fff;
+            border-color: transparent;
+        }
+
+        .timeline-tabs .tab:hover {
+            background: #1e293b;
+        }
+.timeline-wrapper {
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+/* 🔥 TABS */
+.timeline-tabs {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 10px;
+    flex-wrap: wrap;
+}
+
+    .timeline-tabs .tab {
+        flex: 1;
+        padding: 6px;
+        font-size: 12px;
+        border-radius: 8px;
+        background: #020617;
+        border: 1px solid #1f2937;
+        color: #9ca3af;
+        cursor: pointer;
+    }
+
+        .timeline-tabs .tab.active {
+            background: #3b82f6;
+            color: white;
+        }
+
+/* 🔥 TIMELINE */
+.crm-timeline-item {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 12px;
+}
+
+.crm-timeline-icon {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    color: white;
+}
+
+/* COLORS */
+.crm-timeline-item.note .crm-timeline-icon {
+    background: #2563eb;
+}
+
+.crm-timeline-item.followup .crm-timeline-icon {
+    background: #f59e0b;
+}
+
+.crm-timeline-item.assignment .crm-timeline-icon {
+    background: #a855f7;
+}
+.crm-timeline-body {
+    flex: 1;
+    font-size: 12px;
+}
+
+.crm-timeline-header {
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+}
+
+.crm-timeline-desc {
+    font-size: 12px;
+    margin: 4px 0;
+}
+
+.crm-timeline-meta {
+    font-size: 11px;
+    color: #6b7280;
+}
+
+/* 🔥 MOBILE */
+@media (max-width: 768px) {
+
+    .timeline-wrapper {
+        max-height: 60vh;
+    }
+
+    .crm-timeline-header {
+        flex-direction: column;
+        gap: 2px;
+    }
+
+    .timeline-tabs .tab {
+        font-size: 11px;
+        padding: 5px;
+    }
+}

@@ -85,7 +85,10 @@ namespace SalesPulseCRM.WEB.Controllers
         public async Task<IActionResult> GetAllLeads()
         {
             await LoadDropdowns();
-            var allLeads = await _leadService.GetAllLeadsAsync();
+
+            var userId = int.Parse(User.FindFirst("UserId").Value);
+            var role = User.FindFirst(ClaimTypes.Role).Value;
+            var allLeads = await _leadService.GetAllLeadsAsync(userId,role);
 
             return View(allLeads);
         }
@@ -94,14 +97,72 @@ namespace SalesPulseCRM.WEB.Controllers
         public async Task<IActionResult> LeadsToAssign()
         {
             await LoadDropdowns();
-            var freshLeads = await _db.Leads
-       .Where(x => x.CurrentAssignedTo == null && !x.IsDeleted)
-       .Include(x => x.City)
-       .Include(x => x.Project)
-       .Include(x => x.LeadStatus)
-       .ToListAsync();
 
-            ViewBag.Employees = await _db.Users.Where(x => x.Role == "Employee").ToListAsync();
+            var userId = int.Parse(User.FindFirst("UserId").Value);
+            var role = User.FindFirst(ClaimTypes.Role).Value;
+
+            IQueryable<Lead> query = _db.Leads
+                .Where(x => !x.IsDeleted);
+
+            if (role == "Admin")
+            {
+                //Admin sees ALL unassigned leads
+                query = query.Where(x => x.CurrentAssignedTo == null);
+            }
+            else if (role == "Manager")
+            {
+                var teamIds = await _db.Users
+                    .Where(u => u.ManagerId == userId)
+                    .Select(u => u.UserId)
+                    .ToListAsync();
+
+                teamIds.Add(userId); // include manager himself
+
+                query = query.Where(x =>
+                    x.CurrentAssignedTo.HasValue &&
+                    teamIds.Contains(x.CurrentAssignedTo.Value)
+                );
+            }
+            else
+            {
+                // Employees should NOT access this page
+                return Unauthorized();
+            }
+
+            var freshLeads = await (from l in query
+
+                                    join u in _db.Users
+                                    on l.CurrentAssignedTo equals u.UserId into ug
+                                    from u in ug.DefaultIfEmpty()
+
+                                    select new LeadAssignViewModel
+                                    {
+                                        LeadId = l.LeadId,
+                                        CustomerName = l.CustomerName,
+                                        Phone = l.Phone,
+                                        ProjectName = l.Project != null ? l.Project.ProjectName : null,
+                                        CityName = l.City != null ? l.City.CityName : null,
+                                        Status = l.LeadStatus != null ? l.LeadStatus.StatusName : null,
+                                        AssignedToName = u != null ? u.Name : "Unassigned",
+                                        CreatedDate = l.CreatedDate
+                                    })
+                         .ToListAsync();
+
+            // Employees list for assignment
+            if (role == "Admin")
+            {
+                // Admin can assign to ALL employees
+                ViewBag.Employees = await _db.Users
+                    .Where(x => x.Role == "Employee")
+                    .ToListAsync();
+            }
+            else if (role == "Manager")
+            {
+                // Manager can assign ONLY to his team
+                ViewBag.Employees = await _db.Users
+                    .Where(x => x.Role == "Employee" && x.ManagerId == userId)
+                    .ToListAsync();
+            }
 
             return View(freshLeads);
         }
@@ -238,5 +299,80 @@ namespace SalesPulseCRM.WEB.Controllers
             }
           return Ok();
         }
+
+        public async Task<IActionResult> LeadUpdate(int leadId)
+        {
+            var data = await _leadService.GetLeadByIdAsync(leadId);
+
+            await LoadDropdowns();
+            return View (data);
+        }
+
+
+        [HttpPost]
+        public async Task<IActionResult> LeadUpdate(LeadEditViewModel model)
+        {
+            try
+            {
+                // 🔥 FIX 1: Get userId correctly
+                var userIdClaim = User.FindFirst("UserId")?.Value;
+
+                if (string.IsNullOrEmpty(userIdClaim))
+                {
+                    await LoadDropdowns();
+
+                    // 🔥 reload full data
+                    var data = await _leadService.GetLeadByIdAsync(model.Lead.LeadId);
+
+                    TempData["Error"] = "User not authenticated.";
+                    return View("LeadUpdate", data);
+                }
+
+                int userId = int.Parse(userIdClaim);
+
+                if (!ModelState.IsValid)
+                {
+                    await LoadDropdowns();
+
+                    // 🔥 reload full data
+                    var data = await _leadService.GetLeadByIdAsync(model.Lead.LeadId);
+                     
+                    TempData["Error"] = "Please fix validation errors.";
+                    return View("LeadUpdate", data);
+                }
+                 
+                var result = await _leadService.UpdateLeadAsync(model, userId);
+
+                if (!result)
+                {
+                    await LoadDropdowns();
+
+                    var data = await _leadService.GetLeadByIdAsync(model.Lead.LeadId);
+
+                    TempData["Error"] = "Lead not found or update failed.";
+                    return View("LeadUpdate", data);
+                }
+
+                TempData["Success"] = "Lead updated successfully ✅";
+
+                return RedirectToAction("LeadUpdate", new { leadId = model.Lead.LeadId });
+            }
+            catch (Exception)
+            {
+                await LoadDropdowns();
+
+                var data = await _leadService.GetLeadByIdAsync(model.Lead.LeadId);
+
+                TempData["Error"] = "Something went wrong. Try again.";
+                return View("LeadUpdate", data);
+            }
+        }
+        public async Task<IActionResult> GetTimelinePartial(int leadId)
+        {
+            var timeline = await _leadService.GetTimeline(leadId);
+
+            return PartialView("_LeadTimeLine", timeline);
+        }
+
     }
 }

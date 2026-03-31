@@ -11,10 +11,13 @@ namespace SalesPulseCRM.Application.ServiceContracts
     {
         Task<(bool success, string message)> CreateLeadAsync(CreateLeadDto createLeadDto);
 
-        Task<List<LeadResponseDto>> GetAllLeadsAsync();
+        Task<List<LeadResponseDto>> GetAllLeadsAsync(int userId, string role);
 
-        Task<LeadResponseDto?> GetLeadByIdAsync(int id);
-
+        Task<LeadEditViewModel?> GetLeadByIdAsync(int id);
+        Task<bool> UpdateLeadAsync(LeadEditViewModel model, int userId);
         Task<bool> DeleteLeadAsync(int id);
+      
+            Task<List<TimelineItemDto>> GetTimeline(int leadId);
+     
     }
 }

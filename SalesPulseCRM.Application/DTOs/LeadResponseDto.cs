@@ -23,6 +23,9 @@ namespace SalesPulseCRM.Application.DTOs
             public string? ProjectName { get; set; }
             public string? SourceName { get; set; }
             public string? LeadType { get; set; }
+            public int? CurrentAssignTo { get; set; }
+            public string? CurrentAssignToName { get; set; }
+        
 
             public DateTime CreatedDate { get; set; }
         

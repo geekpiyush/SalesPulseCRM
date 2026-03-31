@@ -1,0 +1,100 @@
+﻿@model List<TimelineItemDto>
+
+<link href="~/css/LeadController/LeadTimeLine.css" rel="stylesheet" asp-append-version="true" />
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+<div class="timeline-wrapper">
+
+    <!-- 🔥 TABS -->
+    <div class="timeline-tabs">
+        <button class="tab active" data-type="all">All</button>
+        <button class="tab" data-type="note">Notes</button>
+        <button class="tab" data-type="followup">Followups</button>
+        <button class="tab" data-type="assignment">Assignments</button>
+    </div>
+
+    <!-- 🔥 TIMELINE -->
+    <div class="crm-timeline">
+
+        @if (Model == null || !Model.Any())
+        {
+            <div class="text-center text-muted py-3">
+                No timeline activity
+            </div>
+        }
+        else
+        {
+            @foreach (var item in Model)
+            {
+                var type = item.Type.ToLower();
+
+                string icon = type switch
+                {
+                    "note" => "bi-chat-left-text",
+                    "followup" => "bi-clock-history",
+                    "assignment" => "bi-person-check",
+                    _ => "bi-circle"
+                };
+
+                string color = type switch
+                {
+                    "note" => "note",
+                    "followup" => "followup",
+                    "assignment" => "assignment",
+                    _ => "default"
+                };
+
+                <div class="crm-timeline-item @color" data-type="@type">
+
+                    <div class="crm-timeline-icon">
+                        <i class="bi @icon"></i>
+                    </div>
+
+                    <div class="crm-timeline-body">
+
+                        <div class="crm-timeline-header">
+                            <span class="title">@item.Title</span>
+                            <span class="time">@GetTimeAgo(item.Date)</span>
+                        </div>
+
+                        <div class="crm-timeline-desc">
+                            @item.Description
+                        </div>
+
+                        <div class="crm-timeline-meta">
+                            <i class="bi bi-person"></i> @item.UserName
+                            • @item.Date.ToString("dd MMM yyyy, hh:mm tt")
+                        </div>
+
+                    </div>
+                </div>
+            }
+        }
+
+    </div>
+
+</div>
+
+@functions {
+    public string GetTimeAgo(DateTime date)
+    {
+        var span = DateTime.Now - date;
+
+        if (span.TotalSeconds < 60)
+            return "Just now";
+
+        if (span.TotalMinutes < 60)
+            return $"{(int)span.TotalMinutes} min ago";
+
+        if (span.TotalHours < 24)
+            return $"{(int)span.TotalHours} hrs ago";
+
+        if (span.TotalDays < 2)
+            return "Yesterday";
+
+        return date.ToString("dd MMM");
+    }
+}
+
+
+
+

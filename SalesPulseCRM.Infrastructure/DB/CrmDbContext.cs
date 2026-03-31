@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using SalesPulseCRM.Domain.Entities;
+using SalesPulseCRM.Domain.Enum;
 
 namespace SalesPulseCRM.Infrastructure.DB;
 
@@ -104,7 +105,7 @@ public class CrmDbContext : DbContext
             entity.Property(e => e.FollowupDateTime).IsRequired();
             entity.Property(e => e.Status)
                 .HasMaxLength(50)
-                .HasDefaultValue("Pending");
+                .HasDefaultValue(FollowupStatus.Pending);
 
             entity.HasOne(e => e.Lead)
                 .WithMany(l => l.Followups)

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using SalesPulseCRM.Domain.Enum;
+using System;
 using System.Collections.Generic;
 
 namespace SalesPulseCRM.Domain.Entities;
@@ -13,7 +14,7 @@ public class Followup
     public DateTime FollowupDateTime { get; set; }
     public string? Remarks { get; set; }
 
-    public string Status { get; set; } = null!;
+    public FollowupStatus Status { get; set; } = FollowupStatus.Pending;
     public bool ReminderSent { get; set; } = false;
 
     // 🔗 Navigation

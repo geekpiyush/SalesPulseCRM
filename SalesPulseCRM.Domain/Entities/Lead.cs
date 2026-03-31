@@ -1,4 +1,5 @@
-﻿using System;
+﻿using SalesPulseCRM.Domain.Enum;
+using System;
 using System.Collections.Generic;
 
 namespace SalesPulseCRM.Domain.Entities;
@@ -26,8 +27,11 @@ public class Lead
     // 🔗 Navigation
     public LeadSource? LeadSource { get; set; }
     public LeadStatus? LeadStatus { get; set; }
- 
-
+    public MeetingStatus? MeetingStatus { get; set; }
+    public DateTime? MeetingDateTime { get; set; }
+    public NextAction? NextAction { get; set; }
+    public CustomerInterest? CustomerInterest { get; set; }
+    public Budget? Budget { get; set; }
     public State? State { get; set; }
     public City? City { get; set; }
     public Project? Project { get; set; }

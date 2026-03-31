@@ -2,6 +2,7 @@
 using SalesPulseCRM.Application.DTOs;
 using SalesPulseCRM.Application.ServiceContracts;
 using SalesPulseCRM.Domain.Entities;
+using SalesPulseCRM.Domain.Enum;
 using SalesPulseCRM.Infrastructure.DB;
 using System;
 using System.Collections.Generic;
@@ -56,44 +57,298 @@ namespace SalesPulseCRM.Application.Services
             return true;
         }
 
-        public async Task<List<LeadResponseDto>> GetAllLeadsAsync()
+        public async Task<List<LeadResponseDto>> GetAllLeadsAsync(int userId, string role)
         {
-            return await _db.Leads
-                .Include(x => x.LeadStatus)
-                .Include(x => x.Project)
-                .Include(x => x.City)
-                .Include(x => x.State)
-                .Include(x => x.LeadSource)
-                .Select(x => new LeadResponseDto
+            IQueryable<Lead> query = _db.Leads;
+
+            // 🔐 ROLE BASED FILTERING
+            if (role == "Admin")
+            {
+                // no filter → full access
+            }
+            else if (role == "Manager")
+            {
+                var teamIds = await _db.Users
+                    .Where(u => u.ManagerId == userId)
+                    .Select(u => u.UserId)
+                    .ToListAsync();
+
+                teamIds.Add(userId); // include manager's own leads
+
+                query = query.Where(l =>
+                    (l.CurrentAssignedTo != null && teamIds.Contains(l.CurrentAssignedTo.Value))
+                    
+                );
+            }
+            else if (role == "Employee")
+            {
+                query = query.Where(l => l.CurrentAssignedTo == userId);
+            }
+
+            // 🔥 FINAL PROJECTION
+            return await (from l in query
+
+                          join u in _db.Users
+                          on l.CurrentAssignedTo equals u.UserId into userGroup
+                          from u in userGroup.DefaultIfEmpty()
+
+                          select new LeadResponseDto
+                          {
+                              LeadId = l.LeadId,
+                              CustomerName = l.CustomerName,
+                              Phone = l.Phone,
+                              Email = l.Email,
+
+                              LeadType = l.LeadStatus != null ? l.LeadStatus.StatusName : null,
+
+                              ProjectName = l.Project != null ? l.Project.ProjectName : null,
+                              CityName = l.City != null ? l.City.CityName : null,
+                              StateName = l.State != null ? l.State.StateName : null,
+                              SourceName = l.LeadSource != null ? l.LeadSource.SourceName : null,
+
+                              CurrentAssignTo = l.CurrentAssignedTo,
+                              CurrentAssignToName = u != null ? u.Name : "Unassigned",
+
+                              CreatedDate = l.CreatedDate
+                          })
+                          .OrderByDescending(l => l.CreatedDate) // 🔥 important for UX
+                          .ToListAsync();
+        }
+        public async Task<LeadEditViewModel?> GetLeadByIdAsync(int id)
+        {
+            var lead = await _db.Leads
+               .Include(l => l.Project)
+                .Include(l => l.City)
+                .Include(l => l.LeadStatus)
+                .Include(l => l.Followups)
+                .Include(l => l.Notes)
+                .FirstOrDefaultAsync(l => l.LeadId == id);
+
+            if (lead == null) return null;
+
+            var user = await _db.Users
+                .Where(u => u.UserId == lead.CurrentAssignedTo)
+                .Select(u => u.Name)
+                .FirstOrDefaultAsync();
+
+            // STEP 1: Fetch separately (DB level)
+            var notes = await (from n in _db.LeadNotes
+                               join u in _db.Users on n.UserId equals u.UserId into ug
+                               from u in ug.DefaultIfEmpty()
+                               where n.LeadId == id
+                               select new TimelineItemDto
+                               {
+                                   Type = "Note",
+                                   Title = "Note Added",
+                                   Description = n.NoteText,
+                                   Date = n.CreatedDate,
+                                   UserName = u != null ? u.Name : "System"
+                               }).ToListAsync();
+
+                    var now = DateTime.Now;
+
+                    var followupsRaw = await (from f in _db.Followups
+                                              join u in _db.Users on f.UserId equals u.UserId into ug
+                                              from u in ug.DefaultIfEmpty()
+                                              where f.LeadId == id
+                                              select new
+                                              {
+                                                  f.Status,
+                                                  f.FollowupDateTime,
+                                                  UserName = u != null ? u.Name : "System"
+                                              }).ToListAsync();
+
+                    var followups = followupsRaw.Select(f => new TimelineItemDto
+                    {
+                        Type = "Followup",
+                        Title = "Follow-up",
+
+                        Description =
+                            f.Status == FollowupStatus.Completed
+                                ? $"✅ Completed on {f.FollowupDateTime:dd MMM yyyy hh:mm tt}"
+                                : f.FollowupDateTime < now
+                                    ? $"❌ Missed on {f.FollowupDateTime:dd MMM yyyy hh:mm tt}"
+                                    : $"⏳ Scheduled for {f.FollowupDateTime:dd MMM yyyy hh:mm tt}",
+
+                        Date = f.FollowupDateTime,
+                        UserName = f.UserName
+                    }).ToList();
+
+
+            var assignments = await (from a in _db.LeadAssignments
+                                     join u in _db.Users on a.AssignedTo equals u.UserId into ug
+                                     from u in ug.DefaultIfEmpty()
+                                     where a.LeadId == id
+                                     select new TimelineItemDto
+                                     {
+                                         Type = "Assignment",
+                                         Title = "Lead Assigned",
+                                         Description = "Assigned to " + (u != null ? u.Name : "Unknown"),
+                                         Date = a.AssignedDate,
+                                         UserName = u != null ? u.Name : "System"
+                                     }).ToListAsync();
+
+
+            // STEP 2: Combine in memory (SAFE)
+            var timeline = notes
+                .Concat(followups)
+                .Concat(assignments)
+                .OrderByDescending(x => x.Date)
+                .ToList();
+
+            return new LeadEditViewModel
+            {
+                // DISPLAY
+                CustomerName = lead.CustomerName,
+                Phone = lead.Phone,
+                Email = lead.Email,
+                ProjectName = lead.Project?.ProjectName,
+                CityName = lead.City?.CityName,
+                LeadType = lead.LeadStatus?.StatusName,
+                CurrentAssignToName = user ?? "Unassigned",
+                CreatedDate = lead.CreatedDate,
+
+                // 🔥 THIS WAS YOUR MAIN BUG
+                Timeline = timeline,
+
+                // UPDATE
+                Lead = new UpdateLeadDto
                 {
-                    LeadId = x.LeadId,
-                    CustomerName = x.CustomerName,
-                    Phone = x.Phone,
-                    Email = x.Email,
+                    LeadId = lead.LeadId,
+                    LeadStatusId = lead.LeadStatusId,
+                    ProjectId = lead.ProjectId,
 
-                    LeadType = x.LeadStatus != null ? x.LeadStatus.StatusName : null,
+                    Budget = lead.Budget,
+                    NextAction = lead.NextAction,
+                    CustomerInterest = lead.CustomerInterest,
 
-                    ProjectName = x.Project != null ? x.Project.ProjectName : null,   // 🔥 FIX
-                    CityName = x.City != null ? x.City.CityName : null,              // 🔥 FIX
-                    StateName = x.State != null ? x.State.StateName : null,
-                    SourceName = x.LeadSource != null ? x.LeadSource.SourceName : null,
+                    MeetingStatus = lead.MeetingStatus,
+                    MeetingDateTime = lead.MeetingDateTime,
 
-                    CreatedDate = x.CreatedDate
-                })
-                .ToListAsync();
+                    FollowupDate = lead.Followups?
+                        .OrderByDescending(f => f.FollowupDateTime)
+                        .Select(f => (DateTime?)f.FollowupDateTime)
+                        .FirstOrDefault(),
+
+                    NoteText = lead.Notes?
+                        .OrderByDescending(n => n.CreatedDate)
+                        .Select(n => n.NoteText)
+                        .FirstOrDefault()
+                }
+            };
         }
 
-        public async Task<LeadResponseDto?> GetLeadByIdAsync(int id)
+        public async Task<List<TimelineItemDto>> GetTimeline(int leadId)
         {
-            return await _db.Leads.Where(x => x.LeadId == id)
-                .Select(x => new LeadResponseDto
+            var now = DateTime.Now;
+
+            // NOTES
+            var notes = await (from n in _db.LeadNotes
+                               join u in _db.Users on n.UserId equals u.UserId into ug
+                               from u in ug.DefaultIfEmpty()
+                               where n.LeadId == leadId
+                               select new TimelineItemDto
+                               {
+                                   Type = "Note",
+                                   Title = "Note Added",
+                                   Description = n.NoteText,
+                                   Date = n.CreatedDate,
+                                   UserName = u != null ? u.Name : "System"
+                               }).ToListAsync();
+
+            // FOLLOWUPS
+            var followupsRaw = await (from f in _db.Followups
+                                      join u in _db.Users on f.UserId equals u.UserId into ug
+                                      from u in ug.DefaultIfEmpty()
+                                      where f.LeadId == leadId
+                                      select new
+                                      {
+                                          f.Status,
+                                          f.FollowupDateTime,
+                                          UserName = u != null ? u.Name : "System"
+                                      }).ToListAsync();
+
+            var followups = followupsRaw.Select(f => new TimelineItemDto
+            {
+                Type = "Followup",
+                Title = "Follow-up",
+                Description =
+                    f.Status == FollowupStatus.Completed
+                        ? $"✅ Completed on {f.FollowupDateTime:dd MMM yyyy hh:mm tt}"
+                        : f.FollowupDateTime < now
+                            ? $"❌ Missed on {f.FollowupDateTime:dd MMM yyyy hh:mm tt}"
+                            : $"⏳ Scheduled for {f.FollowupDateTime:dd MMM yyyy hh:mm tt}",
+                Date = f.FollowupDateTime,
+                UserName = f.UserName
+            }).ToList();
+
+            // ASSIGNMENTS
+            var assignments = await (from a in _db.LeadAssignments
+                                     join u in _db.Users on a.AssignedTo equals u.UserId into ug
+                                     from u in ug.DefaultIfEmpty()
+                                     where a.LeadId == leadId
+                                     select new TimelineItemDto
+                                     {
+                                         Type = "Assignment",
+                                         Title = "Lead Assigned",
+                                         Description = "Assigned to " + (u != null ? u.Name : "Unknown"),
+                                         Date = a.AssignedDate,
+                                         UserName = u != null ? u.Name : "System"
+                                     }).ToListAsync();
+
+            // FINAL MERGE
+            return notes
+                .Concat(followups)
+                .Concat(assignments)
+                .OrderByDescending(x => x.Date)
+                .ToList();
+        }
+
+        public async Task<bool> UpdateLeadAsync(LeadEditViewModel model, int userId)
+        {
+            var lead = await _db.Leads
+                .Include(l => l.Followups)
+                .Include(l => l.Notes)
+                .FirstOrDefaultAsync(l => l.LeadId == model.Lead.LeadId);
+
+            if (lead == null)
+                return false;
+
+            // 🔥 UPDATE MAIN LEAD
+            lead.LeadStatusId = model.Lead.LeadStatusId;
+            lead.ProjectId = model.Lead.ProjectId;
+            lead.Budget = model.Lead.Budget;
+            lead.NextAction = model.Lead.NextAction;
+            lead.CustomerInterest = model.Lead.CustomerInterest;
+            lead.MeetingStatus = model.Lead.MeetingStatus;
+            lead.MeetingDateTime = model.Lead.MeetingDateTime;
+
+            // 🔥 NOTE ADD
+            if (!string.IsNullOrWhiteSpace(model.Lead.NoteText))
+            {
+                _db.LeadNotes.Add(new LeadNote
                 {
-                    LeadId = x.LeadId,
-                    CustomerName = x.CustomerName,
-                    Phone = x.Phone,
-                    Email = x.Email,
-                    CreatedDate = x.CreatedDate
-                }).FirstOrDefaultAsync();
+                    LeadId = lead.LeadId,
+                    NoteText = model.Lead.NoteText,
+                    CreatedDate = DateTime.Now,
+                    UserId = userId
+                });
+            }
+
+            // 🔥 FOLLOWUP ADD
+            if (model.Lead.FollowupDate.HasValue)
+            {
+                _db.Followups.Add(new Followup
+                {
+                    LeadId = lead.LeadId,
+                    FollowupDateTime = model.Lead.FollowupDate.Value,
+                    Status = FollowupStatus.Pending,
+                    UserId = userId
+                });
+            }
+
+            await _db.SaveChangesAsync();
+            return true;
         }
     }
 }
