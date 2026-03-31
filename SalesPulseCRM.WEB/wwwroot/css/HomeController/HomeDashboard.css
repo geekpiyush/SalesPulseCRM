@@ -1,0 +1,398 @@
+﻿.dashboard {
+    color: #e2e8f0;
+}
+
+/* 🔥 CARD */
+.card-box {
+    background: #0f172a;
+    padding: 16px;
+    border-radius: 10px;
+    display: flex;
+    gap: 12px;
+    align-items: center;
+}
+
+.card-icon {
+    width: 42px;
+    height: 42px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+}
+
+.bg-blue {
+    background: #2563eb;
+}
+
+.bg-red {
+    background: #dc2626;
+}
+
+.bg-green {
+    background: #16a34a;
+}
+
+.bg-purple {
+    background: #7c3aed;
+}
+
+.card-title {
+    font-size: 13px;
+    color: #94a3b8;
+}
+
+.card-value {
+    font-size: 20px;
+    font-weight: 600;
+}
+
+.card-sub {
+    font-size: 12px;
+    color: #94a3b8;
+}
+
+/* 🔥 CLEAN CARD */
+.card-clean {
+    background: #0f172a;
+    padding: 16px;
+    border-radius: 10px;
+}
+
+/* 🔥 FUNNEL */
+.funnel-box {
+    background: #1e293b;
+    padding: 12px;
+    border-radius: 8px;
+}
+
+.funnel-value {
+    font-size: 18px;
+    font-weight: bold;
+}
+
+.funnel-label {
+    font-size: 12px;
+    color: #94a3b8;
+}
+
+.funnel-box.success {
+    background: #16a34a;
+}
+
+/* 🔥 USERS / AGING */
+.user-row,
+.aging-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px 0;
+    border-bottom: 1px solid #1e293b;
+}
+
+    .aging-row.danger {
+        color: #ef4444;
+    }
+.table-responsive {
+    overflow-x: auto;
+}
+.clickable {
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+    .clickable:hover {
+        transform: translateY(-2px);
+    }
+
+/* 🔥 TASK BREAKDOWN */
+.task-item {
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+    padding: 4px 0;
+}
+
+    .task-item.overdue {
+        color: #ef4444;
+    }
+
+    .task-item.meeting {
+        color: #22c55e;
+    }
+
+/* 🔥 MINI BREAKDOWN */
+.unassigned-breakdown {
+    font-size: 12px;
+}
+
+.mini-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 3px 0;
+    cursor: pointer;
+    border-radius: 4px;
+}
+
+    .mini-item:hover {
+        background: #1e293b;
+    }
+
+    .mini-item.warning {
+        color: #f59e0b;
+    }
+
+/* 🔥 CTA */
+.assign-cta {
+    font-size: 12px;
+    color: #38bdf8;
+    cursor: pointer;
+    font-weight: 500;
+}
+
+    .assign-cta:hover {
+        text-decoration: underline;
+    }
+.converted-breakdown {
+    font-size: 12px;
+}
+.funnel-inline {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+/* 🔥 STEP */
+.funnel-step {
+    flex: 1;
+    min-width: 120px;
+    background: #1e293b;
+    padding: 12px;
+    border-radius: 8px;
+    text-align: center;
+    transition: 0.2s;
+}
+
+    .funnel-step:hover {
+        background: #334155;
+        transform: translateY(-2px);
+    }
+
+    .funnel-step.success {
+        background: #16a34a;
+    }
+
+/* 🔥 ARROW */
+.funnel-arrow {
+    font-size: 18px;
+    color: #64748b;
+}
+
+/* 🔥 TEXT */
+.funnel-value {
+    font-size: 18px;
+    font-weight: 600;
+}
+
+.funnel-label {
+    font-size: 12px;
+    color: #94a3b8;
+}
+
+.funnel-sub {
+    font-size: 11px;
+    margin-top: 4px;
+}
+
+.warning {
+    color: #f59e0b;
+}
+
+.success-text {
+    color: #22c55e;
+}
+/* 🔥 CARD */
+.user-card {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+    border-radius: 8px;
+    transition: 0.2s;
+    margin-bottom: 8px;
+}
+
+    .user-card:hover {
+        background: #1e293b;
+    }
+
+/* 🔥 LEFT */
+.user-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+/* 🔥 AVATAR */
+.user-avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: #2563eb;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+}
+
+/* 🔥 NAME */
+.user-name {
+    font-size: 14px;
+    font-weight: 500;
+}
+
+/* 🔥 META */
+.user-meta {
+    font-size: 12px;
+    color: #94a3b8;
+}
+
+/* 🔥 RIGHT */
+.user-right {
+    text-align: right;
+}
+
+.user-count {
+    font-size: 16px;
+    font-weight: 600;
+}
+
+.user-label {
+    font-size: 11px;
+    color: #94a3b8;
+}
+/* 🔥 CARD */
+.aging-card {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+    border-radius: 8px;
+    margin-bottom: 8px;
+    transition: 0.2s;
+}
+
+    .aging-card:hover {
+        background: #1e293b;
+    }
+
+/* 🔥 LEFT */
+.aging-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+/* 🔥 DOT */
+.aging-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+}
+
+    .aging-dot.safe {
+        background: #22c55e;
+    }
+
+    .aging-dot.warning {
+        background: #f59e0b;
+    }
+
+    .aging-dot.danger {
+        background: #ef4444;
+    }
+
+/* 🔥 RIGHT */
+.aging-right {
+    text-align: right;
+}
+
+.count {
+    font-size: 16px;
+    font-weight: 600;
+}
+
+/* 🔥 STATUS TEXT */
+.status {
+    font-size: 11px;
+}
+
+.safe-text {
+    color: #22c55e;
+}
+
+.warning-text {
+    color: #f59e0b;
+}
+
+.danger-text {
+    color: #ef4444;
+}
+@media (max-width: 768px) {
+
+    .crm-timeline-item {
+        flex-direction: column;
+    }
+
+    .crm-timeline-icon {
+        margin-bottom: 8px;
+    }
+    .card-box {
+        padding: 12px;
+        gap: 10px;
+    }
+
+    .card-value {
+        font-size: 16px;
+    }
+
+    .card-title {
+        font-size: 12px;
+    }
+
+    .card-icon {
+        width: 36px;
+        height: 36px;
+        font-size: 16px;
+    }
+    .funnel-box {
+        margin-bottom: 10px;
+    }
+
+    .card-clean .row {
+        flex-direction: column;
+    }
+    .table-dark-custom th,
+    .table-dark-custom td {
+        font-size: 12px;
+        padding: 8px;
+        white-space: nowrap;
+    }
+    .btn-action {
+        width: 40px;
+        height: 40px;
+    }
+    .filter-card .row > div {
+        width: 100%;
+    }
+
+    .btn {
+        width: 100%;
+    }
+
+    .filter-card .d-flex {
+        flex-direction: column;
+    }
+}

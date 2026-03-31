@@ -350,5 +350,51 @@ namespace SalesPulseCRM.Application.Services
             await _db.SaveChangesAsync();
             return true;
         }
+
+        public async Task<TodayTaskDto> GetTodayTasksAsync()
+        {
+            var result = new TodayTaskDto();
+
+            using (var conn = _db.Database.GetDbConnection())
+            {
+                await conn.OpenAsync();
+
+                using (var cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = @"
+                SELECT 
+                    COUNT(CASE 
+                        WHEN CAST(CurrentAssignedDate AS DATE) = CAST(GETDATE() AS DATE)
+                        AND NextAction IS NOT NULL 
+                        THEN 1 END) AS Followups,
+
+                    COUNT(CASE 
+                        WHEN CAST(CurrentAssignedDate AS DATE) < CAST(GETDATE() AS DATE)
+                        AND NextAction IS NOT NULL 
+                        THEN 1 END) AS Missed,
+
+                    COUNT(CASE 
+                        WHEN CAST(MeetingDateTime AS DATE) = CAST(GETDATE() AS DATE)
+                        AND MeetingStatus IS NOT NULL
+                        THEN 1 END) AS Meetings
+
+                FROM Leads
+                WHERE IsDeleted = 0
+            ";
+
+                    using (var reader = await cmd.ExecuteReaderAsync())
+                    {
+                        if (await reader.ReadAsync())
+                        {
+                            result.Followups = reader.GetInt32(0);
+                            result.Missed = reader.GetInt32(1);
+                            result.Meetings = reader.GetInt32(2);
+                        }
+                    }
+                }
+            }
+
+            return result;
+        }
     }
 }

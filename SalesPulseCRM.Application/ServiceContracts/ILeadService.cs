@@ -18,6 +18,8 @@ namespace SalesPulseCRM.Application.ServiceContracts
         Task<bool> DeleteLeadAsync(int id);
       
             Task<List<TimelineItemDto>> GetTimeline(int leadId);
-     
+        Task<TodayTaskDto> GetTodayTasksAsync();
+
+
     }
 }
