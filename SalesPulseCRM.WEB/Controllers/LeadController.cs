@@ -22,6 +22,7 @@ namespace SalesPulseCRM.WEB.Controllers
 
         private async Task LoadDropdowns()
         {
+
             ViewBag.Sources = await _db.LeadSources.ToListAsync();
             ViewBag.Users = await _db.Users.ToListAsync();
             ViewBag.States = await _db.States.ToListAsync();
@@ -372,6 +373,59 @@ namespace SalesPulseCRM.WEB.Controllers
             var timeline = await _leadService.GetTimeline(leadId);
 
             return PartialView("_LeadTimeLine", timeline);
+        }
+
+        public async Task<IActionResult> GetFilterLeads()
+        {
+            await  LoadDropdowns();
+
+            return View();
+        }
+        [HttpPost]
+        public async Task<IActionResult> GetFilteredLeadsData([FromBody] LeadFilterDto filter)
+        {
+            var query = _db.Leads
+                .AsNoTracking()
+                .Include(x => x.Project)
+                .Include(x => x.LeadStatus)
+                .AsQueryable();
+
+            // Filters
+            if (filter.LeadStatusId.HasValue)
+                query = query.Where(x => x.LeadStatusId == filter.LeadStatusId);
+
+            if (filter.ProjectId.HasValue)
+                query = query.Where(x => x.ProjectId == filter.ProjectId);
+
+            if (filter.UserId.HasValue)
+                query = query.Where(x => x.CurrentAssignedTo == filter.UserId);
+
+            if (filter.FromDate.HasValue)
+                query = query.Where(x => x.CreatedDate >= filter.FromDate.Value);
+
+            if (filter.ToDate.HasValue)
+                query = query.Where(x => x.CreatedDate <= filter.ToDate.Value);
+
+            var data = await query
+                .OrderByDescending(x => x.CreatedDate)
+                .Select(x => new
+                {
+                    x.LeadId,
+                    x.CustomerName,
+                    Project = x.Project != null ? x.Project.ProjectName : "-",
+                    Status = x.LeadStatus != null ? x.LeadStatus.StatusName : "-",
+
+                    // 🔥 FIXED USER LOGIC
+                    User = _db.Users
+                        .Where(u => u.UserId == x.CurrentAssignedTo)
+                        .Select(u => u.Name)
+                        .FirstOrDefault(),
+
+                    Date = x.CreatedDate.ToString("dd MMM yyyy")
+                })
+                .ToListAsync();
+
+            return Json(data);
         }
 
     }

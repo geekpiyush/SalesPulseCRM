@@ -1,0 +1,126 @@
+﻿/* 🔥 Kill Bootstrap muted nonsense */
+.text-muted {
+    color: #94a3b8 !important; /* controlled gray */
+}
+
+/* Labels fix */
+.form-label {
+    font-size: 12px;
+    color: #94a3b8;
+    margin-bottom: 4px;
+}
+.filter-card {
+    background: #0f172a;
+    border-radius: 10px;
+    padding: 16px 18px; /* 🔥 reduced */
+    color: #fff;
+}
+.filter-card h5 {
+    font-size: 16px;
+    font-weight: 500;
+    margin-bottom: 12px;
+}
+
+/* Inputs compact */
+.form-control,
+.form-select {
+    background: #1e293b;
+    border: 1px solid #334155;
+    color: #fff;
+    height: 38px; /* 🔥 smaller */
+    font-size: 13px;
+    padding: 6px 10px;
+}
+
+/* Buttons compact */
+.btn {
+    height: 36px;
+    font-size: 13px;
+    padding: 0 14px;
+}
+.btn-action {
+    width: 34px;
+    height: 34px;
+    border-radius: 8px;
+    border: none;
+    background: #1e293b;
+    color: #cbd5f5;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: 0.2s;
+}
+
+    .btn-action:hover {
+        background: #2563eb;
+        color: #fff;
+    }
+
+.timeline-btn {
+    background: #0f172a;
+}
+.action-cell {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.edit-btn {
+    background: #0f172a;
+}
+/* Reduce gap */
+.row.g-3 {
+    --bs-gutter-y: 10px;
+    --bs-gutter-x: 10px;
+}
+
+    .form-control::placeholder {
+        color: #94a3b8;
+    }
+
+.btn-primary {
+    background: #2563eb;
+    border: none;
+}
+
+.btn-secondary {
+    background: #475569;
+    border: none;
+}
+
+.table-dark-custom {
+    --bs-table-bg: transparent !important;
+    --bs-table-striped-bg: transparent !important;
+    --bs-table-hover-bg: #1e293b !important;
+    color: #fff;
+}
+    .table-dark-custom tbody tr:nth-child(even) {
+        background-color: #111827 !important; /* subtle alternate */
+    }
+    .table-dark-custom tbody tr {
+        background-color: #0f172a !important;
+    }
+
+    .table-dark-custom th {
+        background: #1e293b;
+        color: #cbd5f5; /* 🔥 not white */
+        font-weight: 500;
+        font-size: 13px;
+    }
+
+    .table-dark-custom td {
+        color: #e2e8f0;
+        font-size: 13px;
+    }
+
+.table-hover tbody tr:hover {
+    background: #1e293b;
+}
+
+@media (max-width: 768px) {
+    .filter-card .row > div {
+        width: 100%;
+    }
+}
+
+
