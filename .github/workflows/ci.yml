@@ -1,13 +1,12 @@
-name: .NET CI
+name: Build & Deploy
 
 on:
   push:
     branches:
       - main
-      - master
 
 jobs:
-  build:
+  build-and-deploy:
     runs-on: ubuntu-latest
 
     steps:
@@ -22,5 +21,25 @@ jobs:
       - name: Restore
         run: dotnet restore
 
-      - name: Build
-        run: dotnet build --no-restore
+      - name: Publish
+        run: dotnet publish -c Release -o publish
+
+      # 🔥 COPY TO VPS
+      - name: Copy files via SCP
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.SERVER_IP }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SERVER_SSH_KEY }}
+          source: "publish/*"
+          target: "/var/www/SalesPulseCRM"
+
+      # 🔥 RESTART APP
+      - name: Restart App via SSH
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          host: ${{ secrets.SERVER_IP }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SERVER_SSH_KEY }}
+          script: |
+            systemctl restart myapp
