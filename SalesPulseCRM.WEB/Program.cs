@@ -46,7 +46,7 @@ builder.Services.AddAuthentication("MyCookieAuth")
 builder.Services.AddScoped<EmailServices>();
 
 
-var app = builder.Build();
+var app = builder.Build(); 
 
 // Error handling
 if (!app.Environment.IsDevelopment())
