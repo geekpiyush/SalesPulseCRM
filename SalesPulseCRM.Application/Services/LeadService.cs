@@ -351,9 +351,9 @@ namespace SalesPulseCRM.Application.Services
             return true;
         }
 
-        public async Task<TodayTaskDto> GetTodayTasksAsync()
+        public async Task<List<UserTaskDto>> GetTodayTasksAsync(int userId, string role)
         {
-            var result = new TodayTaskDto();
+            var result = new List<UserTaskDto>();
 
             using (var conn = _db.Database.GetDbConnection())
             {
@@ -363,32 +363,69 @@ namespace SalesPulseCRM.Application.Services
                 {
                     cmd.CommandText = @"
                 SELECT 
+                    u.UserId,
+                    u.Name,
+                    u.Role,
+
                     COUNT(CASE 
-                        WHEN CAST(CurrentAssignedDate AS DATE) = CAST(GETDATE() AS DATE)
-                        AND NextAction IS NOT NULL 
+                        WHEN CAST(l.CurrentAssignedDate AS DATE) = CAST(GETDATE() AS DATE)
+                        AND l.NextAction IS NOT NULL 
                         THEN 1 END) AS Followups,
 
                     COUNT(CASE 
-                        WHEN CAST(CurrentAssignedDate AS DATE) < CAST(GETDATE() AS DATE)
-                        AND NextAction IS NOT NULL 
+                        WHEN CAST(l.CurrentAssignedDate AS DATE) < CAST(GETDATE() AS DATE)
+                        AND l.NextAction IS NOT NULL 
                         THEN 1 END) AS Missed,
 
                     COUNT(CASE 
-                        WHEN CAST(MeetingDateTime AS DATE) = CAST(GETDATE() AS DATE)
-                        AND MeetingStatus IS NOT NULL
-                        THEN 1 END) AS Meetings
+                        WHEN CAST(l.MeetingDateTime AS DATE) = CAST(GETDATE() AS DATE)
+                        AND l.MeetingStatus IS NOT NULL
+                        THEN 1 END) AS Meetings,
 
-                FROM Leads
-                WHERE IsDeleted = 0
+                    COUNT(l.LeadId) AS TotalLeads
+
+                FROM Users u
+                LEFT JOIN Leads l 
+                    ON l.CurrentAssignedTo = u.UserId
+                    AND l.IsDeleted = 0
+
+                WHERE
+                (
+                    @Role = 'Admin'
+                    OR (@Role = 'Manager' AND (u.ManagerId = @UserId OR u.UserId = @UserId))
+                    OR (@Role = 'Employee' AND u.UserId = @UserId)
+                )
+
+                GROUP BY u.UserId, u.Name, u.Role
+                ORDER BY u.Name
             ";
+
+                    var p1 = cmd.CreateParameter();
+                    p1.ParameterName = "@UserId";
+                    p1.Value = userId;
+                    cmd.Parameters.Add(p1);
+
+                    var p2 = cmd.CreateParameter();
+                    p2.ParameterName = "@Role";
+                    p2.Value = role;
+                    cmd.Parameters.Add(p2);
 
                     using (var reader = await cmd.ExecuteReaderAsync())
                     {
-                        if (await reader.ReadAsync())
+                        while (await reader.ReadAsync())
                         {
-                            result.Followups = reader.GetInt32(0);
-                            result.Missed = reader.GetInt32(1);
-                            result.Meetings = reader.GetInt32(2);
+                            result.Add(new UserTaskDto
+                            {
+                                UserId = reader["UserId"] == DBNull.Value ? 0 : Convert.ToInt32(reader["UserId"]),
+                                Name = reader["Name"]?.ToString(),
+                                Role = reader["Role"]?.ToString(),
+
+                                Followups = reader["Followups"] == DBNull.Value ? 0 : Convert.ToInt32(reader["Followups"]),
+                                Missed = reader["Missed"] == DBNull.Value ? 0 : Convert.ToInt32(reader["Missed"]),
+                                Meetings = reader["Meetings"] == DBNull.Value ? 0 : Convert.ToInt32(reader["Meetings"]),
+
+                                TotalLeads = reader["TotalLeads"] == DBNull.Value ? 0 : Convert.ToInt32(reader["TotalLeads"])
+                            });
                         }
                     }
                 }
