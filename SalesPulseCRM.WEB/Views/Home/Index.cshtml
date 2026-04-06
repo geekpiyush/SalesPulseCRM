@@ -3,7 +3,7 @@
 }
 
 <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet" />
-<link href="~/css/HomeController/HomeDashboard.css" rel="stylesheet" />
+<link href="~/css/HomeController/HomeDashboard.css" rel="stylesheet" asp-append-version="true" />
 
 <div class="container-fluid dashboard">
 
@@ -20,15 +20,16 @@
                 <div class="w-100">
                     <div class="card-title">Total Leads</div>
 
-                    <div class="card-value clickable-card"
-                         id="totalLeads"
-                         onclick="goToLeads('all')">
-                        0
-                    </div>
+                    <div class="card-value">
+                        <span class="clickable-card text-success"
+                              onclick="goToLeads('active')">
+                            Active: <strong id="activeLeads">0</strong>
+                        </span>
 
-                    <div class="assign-cta mt-2"
-                         onclick="goToLeads('unassigned')">
-                        Vew →
+                        <span class="clickable-card text-danger"
+                              onclick="goToLeads('dead')">
+                            Lost: <strong id="deadLeads">0</strong>
+                        </span>
                     </div>
                 </div>
 
@@ -65,7 +66,7 @@
 
                         <div class="mini-item clickable-row warning"
                              onclick="goToLeads('unassigned-old')">
-                            <span>2+ Days</span>
+                            <span>1+ Days</span>
                             <span id="oldUnassigned">0</span>
                         </div>
 
@@ -179,34 +180,34 @@
 
                 <!-- 🔥 TOTAL ACTIVE -->
                 <div class="funnel-step root clickable-card" onclick="goToLeads('active')">
-                    <div class="funnel-value" id="totalActive">120</div>
+                    <div class="funnel-value" id="totalActive">0</div>
                     <div class="funnel-label">Active Leads</div>
                 </div>
 
                 <!-- 🔥 ACTIVE BREAKDOWN -->
                 <div class="funnel-state-grid">
                     <div class="state-item" onclick="goToLeads('Attempted Contact')">
-                        <span>60</span>
+                        <span id="attemptedContact">0</span>
                         <small>Attempted Contact</small>
                     </div>
 
                     <div class="state-item" onclick="goToLeads('Needs Follow-up')">
-                        <span>30</span>
+                        <span id="needsFollowUp">0</span>
                         <small>Needs Follow-up</small>
                     </div>
 
                     <div class="state-item" onclick="goToLeads('Callback Scheduled')">
-                        <span>20</span>
+                        <span id="callbackScheduled">0</span>
                         <small>Callback Scheduled</small>
                     </div>
 
                     <div class="state-item" onclick="goToLeads('On Hold')">
-                        <span>15</span>
+                        <span id="onHold">0</span>
                         <small>On Hold</small>
                     </div>
 
                     <div class="state-item success" onclick="goToLeads('Interested')">
-                        <span>18</span>
+                        <span id="interested">0</span>
                         <small>Interested</small>
                     </div>
 
@@ -218,18 +219,34 @@
             <div class="funnel-col positive">
                 <h6 class="branch-title text-success">Positive</h6>
 
-                <div class="funnel-step">80 <span>Contacted</span></div>
-                <div class="funnel-step">45 <span>Qualified</span></div>
-                <div class="funnel-step success">12 <span>Converted</span></div>
+                <div class="funnel-step">
+                    <span id="contacted">0</span> <span>Contacted</span>
+                </div>
+
+                <div class="funnel-step">
+                    <span id="qualified">0</span> <span>Qualified</span>
+                </div>
+
+                <div class="funnel-step success">
+                    <span id="converted">0</span> <span>Converted</span>
+                </div>
             </div>
 
             <!-- NEGATIVE -->
             <div class="funnel-col negative">
                 <h6 class="branch-title text-danger">Drop-offs</h6>
 
-                <div class="funnel-step danger">25 <span>No Response</span></div>
-                <div class="funnel-step danger">18 <span>Not Interested</span></div>
-                <div class="funnel-step danger">10 <span>Lost</span></div>
+                <div class="funnel-step danger">
+                    <span id="noResponse">0</span> <span>No Response</span>
+                </div>
+
+                <div class="funnel-step danger">
+                    <span id="notInterested">0</span> <span>Not Interested</span>
+                </div>
+
+                <div class="funnel-step danger">
+                    <span id="lost">0</span> <span>Lost</span>
+                </div>
             </div>
 
         </div>
@@ -434,64 +451,81 @@
     .then(html => {
         document.getElementById('dashboardTimeline').innerHTML = html;
     });
+    
 
-    async function loadTodayTask()
+       async function loadLeadsCount() {
+        try {
+            const res = await fetch('/api/leadapi/leads-count'); 
+            const data = await res.json();
+
+           
+             document.getElementById("activeLeads").innerText = data.totalActiveLeads;
+            document.getElementById("deadLeads").innerText = data.lostLeads;
+
+        } catch (err) {
+            console.error("Error loading leads count:", err);
+        }
+    }
+
+
+    async function loadUnassignedLeads()
     {
-        try{
-            const response = await fetch('/api/leadapi/today-tasks')
-
-            if(!response.ok)
-            {
-                throw new Error("API Failed")
-            }
-
-            const data = await response.json();
-         document.getElementById("followupsCount").innerText = data.followups;
-        document.getElementById("missedCount").innerText = data.missed;
-        document.getElementById("meetingsCount").innerText = data.meetings;
-        }catch (error) {
-        console.error("TodayTasks Error:", error);
-    }
-    }
-        async function loadUnassignedLeads() {
-        try {
+        try
+        {
             const response = await fetch('/api/leadapi/unassigned-leads');
-            
-            if (!response.ok) {
-                throw new Error("API failed");
-            }
-
             const data = await response.json();
-            console.log(data);
-            // 🔥 Bind values
-            document.getElementById("totalUnassigned").innerText = data.totalUnassigned;
-            document.getElementById("todayUnassigned").innerText = data.today;
-                document.getElementById("oldUnassigned").innerText = data.threePlusDays
-    ;
 
-        } catch (error) {
-            console.error("Unassigned Leads Error:", error);
+            document.getElementById('totalUnassigned').innerText = data.totalUnassigned;
+            document.getElementById('todayUnassigned').innerText = data.today;
+            document.getElementById('oldUnassigned').innerText = data.onePlusDays;
+        }catch(err)
+        {
+            console.log("unassigned Leads Error:",err);
         }
     }
-        async function loadTotalLeads() {
+
+        async function loadConvertedLeads() {
+        const res = await fetch('/api/leadapi/converted-leads');
+        const data = await res.json();
+
+        document.getElementById('convertedTotal').innerText = data.total;
+        document.getElementById('convertedToday').innerText = data.today;
+        document.getElementById('convertedWeek').innerText = data.thisWeek;
+        document.getElementById('convertedMonth').innerText = data.thisMonth;
+    }
+
+     async function loadLeadFunnel() {
         try {
-            const response = await fetch('/api/leadapi/total-leads');
+            const res = await fetch('/api/leadapi/lead-funnel');
+            const data = await res.json();
 
-            if (!response.ok) {
-                throw new Error("API failed");
-            }
+            // 🔥 CENTER
+            document.getElementById("totalActive").innerText = data.totalActive;
 
-            const data = await response.json();
+            document.getElementById("attemptedContact").innerText = data.attemptedContact;
+            document.getElementById("needsFollowUp").innerText = data.needsFollowUp;
+            document.getElementById("callbackScheduled").innerText = data.callbackScheduled;
+            document.getElementById("onHold").innerText = data.onHold;
+            document.getElementById("interested").innerText = data.interested;
 
-            document.getElementById("totalLeads").innerText = data.totalLeads;
+            // 🔥 POSITIVE
+            document.getElementById("contacted").innerText = data.contacted;
+            document.getElementById("qualified").innerText = data.qualified;
+            document.getElementById("converted").innerText = data.converted;
 
-        } catch (error) {
-            console.error("Total Leads Error:", error);
+            // 🔥 NEGATIVE
+            document.getElementById("noResponse").innerText = data.noResponse;
+            document.getElementById("notInterested").innerText = data.notInterested;
+            document.getElementById("lost").innerText = data.lost;
+
+        } catch (err) {
+            console.error("Lead Funnel Load Failed:", err);
         }
     }
-       document.addEventListener("DOMContentLoaded", function () {
-        loadTodayTask();       
-        loadUnassignedLeads();
-        loadTotalLeads();
-    });
+
+    loadLeadsCount();
+    loadUnassignedLeads();
+    loadConvertedLeads();
+    loadLeadFunnel();
+
 </script>

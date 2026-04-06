@@ -10,6 +10,6 @@ namespace SalesPulseCRM.Application.DTOs
     {
         public int TotalUnassigned { get; set; }
         public int Today { get; set; }
-        public int ThreePlusDays { get; set; }
+        public int OnePlusDays { get; set; }
     }
 }

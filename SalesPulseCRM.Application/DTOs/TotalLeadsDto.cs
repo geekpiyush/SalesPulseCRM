@@ -8,6 +8,8 @@ namespace SalesPulseCRM.Application.DTOs
 {
     public class TotalLeadsDto
     {
-        public int TotalLeads { get; set; }
+        public int TotalActiveLeads { get; set; }
+        public int LostLeads { get; set; }
+
     }
 }

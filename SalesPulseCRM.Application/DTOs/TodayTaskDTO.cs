@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 namespace SalesPulseCRM.Application.DTOs
 {
     public class UserTaskDto
+
     {
         public int UserId { get; set; }
 

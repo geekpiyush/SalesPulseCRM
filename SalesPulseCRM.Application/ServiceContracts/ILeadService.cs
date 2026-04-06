@@ -17,9 +17,13 @@ namespace SalesPulseCRM.Application.ServiceContracts
         Task<bool> UpdateLeadAsync(LeadEditViewModel model, int userId);
         Task<bool> DeleteLeadAsync(int id);
       
-            Task<List<TimelineItemDto>> GetTimeline(int leadId);
+        Task<List<TimelineItemDto>> GetTimeline(int leadId);
         Task<List<UserTaskDto>> GetTodayTasksAsync(int userId, string role);
+        Task<TotalLeadsDto> GetTotalLeadCount(int userId, string role);
 
+        Task<UnassignedLeadDto> GetTotalUnassignedLead();
+        Task<ConvertedStatsDto> GetConvertedLeads(int userId, string role);
+        Task<LeadFunnelDto> GetLeadFunnelAsync(int userId, string role);
 
     }
 }

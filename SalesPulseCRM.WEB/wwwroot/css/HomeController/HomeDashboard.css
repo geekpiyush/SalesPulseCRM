@@ -340,6 +340,39 @@
 .danger-text {
     color: #ef4444;
 }
+/* 🔥 KPI container */
+.card-value {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+    /* 🔥 Active / Dead text */
+    .card-value span {
+        font-size: 14px;
+        font-weight: 500;
+    }
+
+        /* 🔥 Numbers inside */
+        .card-value span strong {
+            font-size: 22px;
+            font-weight: 700;
+        }
+
+/* 🔥 Colors (already good but refine) */
+.text-success {
+    color: #22c55e !important;
+}
+
+.text-danger {
+    color: #ef4444 !important;
+}
+
+/* 🔥 Card title smaller */
+.card-title {
+    font-size: 13px;
+    opacity: 0.7;
+}
 @media (max-width: 768px) {
 
     .crm-timeline-item {

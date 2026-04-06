@@ -322,6 +322,7 @@ namespace SalesPulseCRM.Application.Services
             lead.CustomerInterest = model.Lead.CustomerInterest;
             lead.MeetingStatus = model.Lead.MeetingStatus;
             lead.MeetingDateTime = model.Lead.MeetingDateTime;
+            lead.LastUpdatedDate  = DateTime.Now;
 
             // 🔥 NOTE ADD
             if (!string.IsNullOrWhiteSpace(model.Lead.NoteText))
@@ -351,9 +352,172 @@ namespace SalesPulseCRM.Application.Services
             return true;
         }
 
-        public async Task<List<UserTaskDto>> GetTodayTasksAsync(int userId, string role)
+        //public async Task<List<UserTaskDto>> GetTodayTasksAsync(int userId, string role)
+        //{
+        //    var result = new List<UserTaskDto>();
+
+        //    using (var conn = _db.Database.GetDbConnection())
+        //    {
+        //        await conn.OpenAsync();
+
+        //        using (var cmd = conn.CreateCommand())
+        //        {
+        //            cmd.CommandText = @"
+        //                SELECT 
+        //                    u.UserId,
+        //                    u.Name,
+        //                    u.Role,
+
+        //                    -- 🔥 FOLLOWUPS (Today)
+        //                    COUNT(CASE 
+        //                        WHEN f.FollowupDateTime >= CAST(GETDATE() AS DATE)
+        //                        AND f.FollowupDateTime < DATEADD(DAY, 1, CAST(GETDATE() AS DATE))
+        //                        THEN 1 END) AS Followups,
+
+        //                    -- 🔥 MISSED (Overdue)
+        //                    COUNT(CASE 
+        //                        WHEN f.FollowupDateTime < CAST(GETDATE() AS DATE)
+        //                        THEN 1 END) AS Missed,
+
+        //                    -- 🔥 MEETINGS (Today)
+        //                    COUNT(CASE 
+        //                        WHEN l.MeetingDateTime >= CAST(GETDATE() AS DATE)
+        //                        AND l.MeetingDateTime < DATEADD(DAY, 1, CAST(GETDATE() AS DATE))
+        //                        THEN 1 END) AS Meetings,
+
+        //                    COUNT(DISTINCT l.LeadId) AS TotalLeads
+
+        //                FROM Users u
+
+        //                LEFT JOIN Leads l 
+        //                    ON l.CurrentAssignedTo = u.UserId
+        //                    AND l.IsDeleted = 0
+
+        //                LEFT JOIN Followups f 
+        //                    ON f.LeadId = l.LeadId
+        //                    AND f.UserId = u.UserId
+
+        //                WHERE
+        //                (
+        //                    @Role = 'Admin'
+        //                    OR (@Role = 'Manager' AND (u.ManagerId = @UserId OR u.UserId = @UserId))
+        //                    OR (@Role = 'Employee' AND u.UserId = @UserId)
+        //                )
+
+        //                GROUP BY u.UserId, u.Name, u.Role
+        //                ORDER BY u.Name
+        //                ";
+
+        //            var p1 = cmd.CreateParameter();
+        //            p1.ParameterName = "@UserId";
+        //            p1.Value = userId;
+        //            cmd.Parameters.Add(p1);
+
+        //            var p2 = cmd.CreateParameter();
+        //            p2.ParameterName = "@Role";
+        //            p2.Value = role;
+        //            cmd.Parameters.Add(p2);
+
+        //            using (var reader = await cmd.ExecuteReaderAsync())
+        //            {
+        //                while (await reader.ReadAsync())
+        //                {
+        //                    result.Add(new UserTaskDto
+        //                    {
+        //                        UserId = reader["UserId"] == DBNull.Value ? 0 : Convert.ToInt32(reader["UserId"]),
+        //                        Name = reader["Name"]?.ToString(),
+        //                        Role = reader["Role"]?.ToString(),
+
+        //                        Followups = reader["Followups"] == DBNull.Value ? 0 : Convert.ToInt32(reader["Followups"]),
+        //                        Missed = reader["Missed"] == DBNull.Value ? 0 : Convert.ToInt32(reader["Missed"]),
+        //                        Meetings = reader["Meetings"] == DBNull.Value ? 0 : Convert.ToInt32(reader["Meetings"]),
+
+        //                        TotalLeads = reader["TotalLeads"] == DBNull.Value ? 0 : Convert.ToInt32(reader["TotalLeads"])
+        //                    });
+        //                }
+        //            }
+        //        }
+        //    }
+
+        //    return result;
+        //}
+
+        public async Task<TotalLeadsDto> GetTotalLeadCount(int userId, string role)
         {
-            var result = new List<UserTaskDto>();
+            var result = new TotalLeadsDto();
+
+            using (var conn = _db.Database.GetDbConnection())
+            {
+                await conn.OpenAsync();
+
+                using (var cmd = conn.CreateCommand())
+                {
+                    string roleFilter = "";
+
+                    if (role == "Employee")
+                    {
+                        roleFilter = "AND l.CurrentAssignedTo = @UserId";
+                    }
+                    else if (role == "Manager")
+                    {
+                        // Manager: own + team
+                        roleFilter = @"
+                    AND l.CurrentAssignedTo IN (
+                        SELECT UserId FROM Users WHERE ManagerId = @UserId
+                        UNION
+                        SELECT @UserId
+                    )";
+                    }
+                    // Admin = no filter
+
+                    cmd.CommandText = $@"
+                SELECT 
+                    COUNT(CASE 
+                        WHEN ls.StatusName NOT IN (
+                            'Blacklisted','Lost','Not Interested',
+                            'Invalid Lead','Duplicate Lead',
+                            'Do Not Contact','Unqualified'
+                        )
+                        THEN 1 
+                    END) AS ActiveLeads,
+
+                    COUNT(CASE 
+                        WHEN ls.StatusName IN (
+                            'Blacklisted','Lost','Not Interested',
+                            'Invalid Lead','Duplicate Lead',
+                            'Do Not Contact','Unqualified'
+                        )
+                        THEN 1 
+                    END) AS DeadLeads
+
+                FROM Leads l
+                JOIN LeadStatus ls ON l.LeadStatusId = ls.LeadStatusId
+                WHERE l.IsDeleted = 0
+                {roleFilter};
+            ";
+
+                    var param = cmd.CreateParameter();
+                    param.ParameterName = "@UserId";
+                    param.Value = userId;
+                    cmd.Parameters.Add(param);
+
+                    using (var reader = await cmd.ExecuteReaderAsync())
+                    {
+                        if (await reader.ReadAsync())
+                        {
+                            result.TotalActiveLeads = reader.GetInt32(0);
+                            result.LostLeads = reader.GetInt32(1);
+                        }
+                    }
+                }
+            }
+
+            return result;
+        }
+
+        public async Task<UnassignedLeadDto> GetTotalUnassignedLead()
+        {
+            var result = new UnassignedLeadDto();
 
             using (var conn = _db.Database.GetDbConnection())
             {
@@ -363,41 +527,158 @@ namespace SalesPulseCRM.Application.Services
                 {
                     cmd.CommandText = @"
                 SELECT 
-                    u.UserId,
-                    u.Name,
-                    u.Role,
+                    COUNT(*) AS TotalUnassigned,
 
                     COUNT(CASE 
-                        WHEN CAST(l.CurrentAssignedDate AS DATE) = CAST(GETDATE() AS DATE)
-                        AND l.NextAction IS NOT NULL 
-                        THEN 1 END) AS Followups,
+                        WHEN CAST(CreatedDate AS DATE) = CAST(GETDATE() AS DATE) 
+                        THEN 1 END) AS Today,
 
                     COUNT(CASE 
-                        WHEN CAST(l.CurrentAssignedDate AS DATE) < CAST(GETDATE() AS DATE)
-                        AND l.NextAction IS NOT NULL 
-                        THEN 1 END) AS Missed,
+                        WHEN CAST(CreatedDate AS DATE) < CAST(GETDATE() AS DATE) 
+                        THEN 1 END) AS OnePlusDay
+
+                FROM Leads
+                WHERE 
+                    IsDeleted = 0
+                    AND (CurrentAssignedTo IS NULL OR CurrentAssignedTo = 0)
+            ";
+
+                    using (var reader = await cmd.ExecuteReaderAsync())
+                    {
+                        if (await reader.ReadAsync())
+                        {
+                            result.TotalUnassigned = Convert.ToInt32(reader["TotalUnassigned"]);
+                            result.Today = Convert.ToInt32(reader["Today"]);
+                            result.OnePlusDays = Convert.ToInt32(reader["OnePlusDay"]);
+                        }
+                    }
+                }
+            }
+
+            return result;
+        }
+        public async Task<ConvertedStatsDto> GetConvertedLeads(int userId, string role)
+        {
+            var result = new ConvertedStatsDto();
+
+            using (var conn = _db.Database.GetDbConnection())
+            {
+                await conn.OpenAsync();
+
+                using (var cmd = conn.CreateCommand())
+                {
+                    var query = @"
+                SELECT 
+                    COUNT(*) AS TotalConverted,
 
                     COUNT(CASE 
-                        WHEN CAST(l.MeetingDateTime AS DATE) = CAST(GETDATE() AS DATE)
-                        AND l.MeetingStatus IS NOT NULL
-                        THEN 1 END) AS Meetings,
+                        WHEN CAST(LastUpdatedDate AS DATE) = CAST(GETDATE() AS DATE)
+                        THEN 1 END) AS Today,
 
-                    COUNT(l.LeadId) AS TotalLeads
+                    COUNT(CASE 
+                        WHEN DATEPART(WEEK, LastUpdatedDate) = DATEPART(WEEK, GETDATE())
+                             AND YEAR(LastUpdatedDate) = YEAR(GETDATE())
+                        THEN 1 END) AS ThisWeek,
 
-                FROM Users u
-                LEFT JOIN Leads l 
-                    ON l.CurrentAssignedTo = u.UserId
-                    AND l.IsDeleted = 0
+                    COUNT(CASE 
+                        WHEN MONTH(LastUpdatedDate) = MONTH(GETDATE())
+                             AND YEAR(LastUpdatedDate) = YEAR(GETDATE())
+                        THEN 1 END) AS ThisMonth
 
-                WHERE
-                (
-                    @Role = 'Admin'
-                    OR (@Role = 'Manager' AND (u.ManagerId = @UserId OR u.UserId = @UserId))
-                    OR (@Role = 'Employee' AND u.UserId = @UserId)
-                )
+                FROM Leads
+                WHERE 
+                    IsDeleted = 0
+                    AND LeadStatusId = 18
+            ";
 
-                GROUP BY u.UserId, u.Name, u.Role
-                ORDER BY u.Name
+
+                    if (role == "Employee")
+                    {
+                        query += " AND CurrentAssignedTo = @UserId";
+                    }
+                    else if (role == "Manager")
+                    {
+                        query += @" AND CurrentAssignedTo IN (
+                                SELECT UserId FROM Users WHERE ManagerId = @UserId
+                                UNION SELECT @UserId
+                            )";
+                    }
+
+                    cmd.CommandText = query;
+
+                    var param = cmd.CreateParameter();
+                    param.ParameterName = "@UserId";
+                    param.Value = userId;
+                    cmd.Parameters.Add(param);
+
+                    using (var reader = await cmd.ExecuteReaderAsync())
+                    {
+                        if (await reader.ReadAsync())
+                        {
+                            result.Total = Convert.ToInt32(reader["TotalConverted"]);
+                            result.Today = Convert.ToInt32(reader["Today"]);
+                            result.ThisWeek = Convert.ToInt32(reader["ThisWeek"]);
+                            result.ThisMonth = Convert.ToInt32(reader["ThisMonth"]);
+                        }
+                    }
+                }
+            }
+
+            return result;
+        }
+
+        public async Task<LeadFunnelDto> GetLeadFunnelAsync(int userId, string role)
+        {
+            var result = new LeadFunnelDto();
+
+            using (var conn = _db.Database.GetDbConnection())
+            {
+                await conn.OpenAsync();
+
+                using (var cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = @"
+                SELECT 
+                    COUNT(*) AS TotalActive,
+
+                    COUNT(CASE WHEN ls.StatusName = 'Attempted Contact' THEN 1 END) AS AttemptedContact,
+                    COUNT(CASE WHEN ls.StatusName = 'Needs Follow-up' THEN 1 END) AS NeedsFollowUp,
+                    COUNT(CASE WHEN ls.StatusName = 'Callback Scheduled' THEN 1 END) AS CallbackScheduled,
+                    COUNT(CASE WHEN ls.StatusName = 'On Hold' THEN 1 END) AS OnHold,
+                    COUNT(CASE WHEN ls.StatusName = 'Interested' THEN 1 END) AS Interested,
+
+                    COUNT(CASE WHEN ls.StatusName = 'Contacted' THEN 1 END) AS Contacted,
+                    COUNT(CASE WHEN ls.StatusName = 'Qualified' THEN 1 END) AS Qualified,
+                    COUNT(CASE WHEN ls.StatusName = 'Converted' THEN 1 END) AS Converted,
+
+                    COUNT(CASE WHEN ls.StatusName = 'No Response' THEN 1 END) AS NoResponse,
+                    COUNT(CASE WHEN ls.StatusName = 'Not Interested' THEN 1 END) AS NotInterested,
+                    COUNT(CASE WHEN ls.StatusName = 'Lost' THEN 1 END) AS Lost
+
+                FROM Leads l
+                LEFT JOIN LeadStatus ls ON ls.LeadStatusId = l.LeadStatusId
+
+                WHERE 
+                    l.IsDeleted = 0
+
+                    AND (
+                        @Role = 'Admin'
+
+                        OR (
+                            @Role = 'Manager' 
+                            AND (
+                                l.CurrentAssignedTo = @UserId
+                                OR l.CurrentAssignedTo IN (
+                                    SELECT UserId FROM Users WHERE ManagerId = @UserId
+                                )
+                            )
+                        )
+
+                        OR (
+                            @Role = 'Employee' 
+                            AND l.CurrentAssignedTo = @UserId
+                        )
+                    )
             ";
 
                     var p1 = cmd.CreateParameter();
@@ -412,26 +693,34 @@ namespace SalesPulseCRM.Application.Services
 
                     using (var reader = await cmd.ExecuteReaderAsync())
                     {
-                        while (await reader.ReadAsync())
+                        if (await reader.ReadAsync())
                         {
-                            result.Add(new UserTaskDto
-                            {
-                                UserId = reader["UserId"] == DBNull.Value ? 0 : Convert.ToInt32(reader["UserId"]),
-                                Name = reader["Name"]?.ToString(),
-                                Role = reader["Role"]?.ToString(),
+                            result.TotalActive = Convert.ToInt32(reader["TotalActive"]);
 
-                                Followups = reader["Followups"] == DBNull.Value ? 0 : Convert.ToInt32(reader["Followups"]),
-                                Missed = reader["Missed"] == DBNull.Value ? 0 : Convert.ToInt32(reader["Missed"]),
-                                Meetings = reader["Meetings"] == DBNull.Value ? 0 : Convert.ToInt32(reader["Meetings"]),
+                            result.AttemptedContact = Convert.ToInt32(reader["AttemptedContact"]);
+                            result.NeedsFollowUp = Convert.ToInt32(reader["NeedsFollowUp"]);
+                            result.CallbackScheduled = Convert.ToInt32(reader["CallbackScheduled"]);
+                            result.OnHold = Convert.ToInt32(reader["OnHold"]);
+                            result.Interested = Convert.ToInt32(reader["Interested"]);
 
-                                TotalLeads = reader["TotalLeads"] == DBNull.Value ? 0 : Convert.ToInt32(reader["TotalLeads"])
-                            });
+                            result.Contacted = Convert.ToInt32(reader["Contacted"]);
+                            result.Qualified = Convert.ToInt32(reader["Qualified"]);
+                            result.Converted = Convert.ToInt32(reader["Converted"]);
+
+                            result.NoResponse = Convert.ToInt32(reader["NoResponse"]);
+                            result.NotInterested = Convert.ToInt32(reader["NotInterested"]);
+                            result.Lost = Convert.ToInt32(reader["Lost"]);
                         }
                     }
                 }
             }
 
             return result;
+        }
+
+        public Task<List<UserTaskDto>> GetTodayTasksAsync(int userId, string role)
+        {
+            throw new NotImplementedException();
         }
     }
 }

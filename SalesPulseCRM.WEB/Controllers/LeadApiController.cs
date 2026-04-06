@@ -20,56 +20,62 @@ namespace SalesPulseCRM.WEB.Controllers
           
         }
 
-        [HttpGet("today-tasks")]
-        public async Task<IActionResult> GetTodayTasks()
-        {
-            var userIdClaim = User.FindFirst("UserId")?.Value;
-            var roleClaim = User.FindFirst(ClaimTypes.Role)?.Value;
-
-            if (string.IsNullOrEmpty(userIdClaim) || string.IsNullOrEmpty(roleClaim))
-            {
-                return Unauthorized("Invalid user context");
-            }
-
-            if (!int.TryParse(userIdClaim, out int userId))
-            {
-                return BadRequest("Invalid UserId");
-            }
-
-            var result = await _leadService.GetTodayTasksAsync(userId, roleClaim);
-
-            return Ok(result);
-        }
-
-        //[HttpGet("unassigned-leads")]
-        //public async Task<IActionResult> GetUnassignedLeads()
+        //[HttpGet("today-tasks")]
+        //public async Task<IActionResult> GetTodayTasks()
         //{
-        //    var result = await _leadService.GetUnassignedLeadsAsync();
+        //    var userIdClaim = User.FindFirst("UserId")?.Value;
+        //    var roleClaim = User.FindFirst(ClaimTypes.Role)?.Value;
+
+        //    if (string.IsNullOrEmpty(userIdClaim) || string.IsNullOrEmpty(roleClaim))
+        //    {
+        //        return Unauthorized("Invalid user context");
+        //    }
+
+        //    if (!int.TryParse(userIdClaim, out int userId))
+        //    {
+        //        return BadRequest("Invalid UserId");
+        //    }
+
+        //    var result = await _leadService.GetTodayTasksAsync(userId, roleClaim);
+
         //    return Ok(result);
         //}
 
-        //[HttpGet("total-leads")]
-        //public async Task<IActionResult> GetTotalLeads()
-        //{
-        //    try
-        //    {
-        //        var userId = int.Parse(User.FindFirst("UserId")?.Value);
-        //        var role = User.FindFirst(ClaimTypes.Role)?.Value;
+        [HttpGet("leads-count")]
+        public async Task<IActionResult> GetLeadsCount()
+        {
+            var userIdClaim = int.Parse(User.FindFirst("UserId")?.Value);
+            var roleClaim = User.FindFirst(ClaimTypes.Role).Value;
 
-        //        var result = await _leadService.GetTotalLeadsCount();
-        //        return Ok(result);
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        return StatusCode(500, ex.Message); // 👈 temporarily show real error
-        //    }
-        //}
+            var data = await _leadService.GetTotalLeadCount(userIdClaim, roleClaim);
+            return Ok(data);
+        }
 
-        //[HttpGet("converted-leads")]
-        //public async Task<IActionResult> GetConvertedStats()
-        //{
-        //    var data = await _leadService.GetAllConvertedLeads();
-        //    return Ok(data);
-        //}
+        [HttpGet("unassigned-leads")]
+        public async Task<IActionResult> GetAllUnassignedLeads()
+        {
+            var data = await _leadService.GetTotalUnassignedLead();
+            return Ok(data);
+        }
+
+        [HttpGet("converted-leads")]
+        public async Task<IActionResult> GetAllConvertedLeadsCount()
+        {
+            var userId =int.Parse(User.FindFirst("UserId").Value);
+           var roleClaim = User.FindFirst(ClaimTypes.Role).Value;
+
+            var data = await _leadService.GetConvertedLeads(userId, roleClaim);
+            return Ok(data);
+        }
+
+        [HttpGet("lead-funnel")]
+        public async Task<IActionResult> GetLeadFunnel()
+        {
+            var userId = int.Parse(User.FindFirst("UserId").Value);
+            var roleClaim = User.FindFirst(ClaimTypes.Role).Value;
+
+            var data = await _leadService.GetLeadFunnelAsync(userId, roleClaim);
+            return Ok(data);
+        }
     }
 }
