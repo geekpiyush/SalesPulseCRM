@@ -311,6 +311,8 @@ namespace SalesPulseCRM.WEB.Controllers
         [HttpGet]
         public async Task<IActionResult> UpdateUser(int userId)
         {
+
+
             var user = await _db.Users.FirstOrDefaultAsync(u => u.UserId == userId);
 
             if (user == null)
@@ -318,6 +320,7 @@ namespace SalesPulseCRM.WEB.Controllers
                 return NotFound();
             }
 
+           
 
             var model = new UpdateUserViewModel
             {
@@ -349,6 +352,43 @@ namespace SalesPulseCRM.WEB.Controllers
             if(user == null)
             {
                 return NotFound();
+            }
+
+            if(updateUserView.Role == "Employee" && updateUserView.ManagerId == null)
+            {
+                ModelState.AddModelError("ManagerId", "Manager is required for employee");
+
+                updateUserView.Managers = await _db.Users.Where(u => u.Role == "Manager").ToListAsync();
+
+                return View(updateUserView);
+            }
+
+            if(updateUserView.Role != "Employee")
+            {
+                updateUserView.ManagerId = null;
+            }
+
+            if(updateUserView.ManagerId == updateUserView.UserId)
+            {
+                ModelState.AddModelError("ManagerId", "User cannot be their own manager");
+
+                updateUserView.Managers = await _db.Users.Where(u => u.Role == "Manager").ToListAsync();
+
+                return View(updateUserView);
+            }
+
+            if(updateUserView.ManagerId != null)
+            {
+                var validManager = await _db.Users.AnyAsync(u => u.UserId == updateUserView.ManagerId && u.Role == "Manager");
+
+                if(!validManager)
+                {
+                    ModelState.AddModelError("ManagerId", "Invalid Manager selected");
+
+                    updateUserView.Managers = await _db.Users.Where(u => u.Role == "Manager").ToListAsync();
+
+                    return View(updateUserView);
+                }
             }
 
             user.Name = updateUserView.Name;

@@ -282,17 +282,29 @@ namespace SalesPulseCRM.Application.Services
 
             // ASSIGNMENTS
             var assignments = await (from a in _db.LeadAssignments
-                                     join u in _db.Users on a.AssignedTo equals u.UserId into ug
-                                     from u in ug.DefaultIfEmpty()
+
+                                     join toUser in _db.Users
+                                     on a.AssignedTo equals toUser.UserId into toGroup
+                                     from toUser in toGroup.DefaultIfEmpty()
+
+                                     join byUser in _db.Users
+                                     on a.AssignedBy equals byUser.UserId into byGroup
+                                     from byUser in byGroup.DefaultIfEmpty()
+
                                      where a.LeadId == leadId
+
                                      select new TimelineItemDto
                                      {
                                          Type = "Assignment",
                                          Title = "Lead Assigned",
-                                         Description = "Assigned to " + (u != null ? u.Name : "Unknown"),
+
+                                         Description = $"Assigned to {toUser.Name} by {byUser.Name}",
+
                                          Date = a.AssignedDate,
-                                         UserName = u != null ? u.Name : "System"
-                                     }).ToListAsync();
+
+                                         UserName = byUser != null ? byUser.Name : "System"
+                                     })
+                           .ToListAsync();
 
             // FINAL MERGE
             return notes

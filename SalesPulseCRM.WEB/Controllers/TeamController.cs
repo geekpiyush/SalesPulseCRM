@@ -143,7 +143,7 @@ namespace SalesPulseCRM.WEB.Controllers
 
             ViewBag.Team = team;
             ViewBag.Users = allUsers;
-            ViewBag.Members = existingMembers; // 🔥 THIS WAS MISSING
+            ViewBag.Members = existingMembers;
 
             return View();
         }

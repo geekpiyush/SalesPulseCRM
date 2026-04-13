@@ -75,3 +75,22 @@
     </form>
 
 </div>
+<script>
+        const roleDropdown = document.querySelector('[name="Role"]');
+    const managerField = document.querySelector('[name="ManagerId"]').closest('.form-group');
+    const managerSelect = document.querySelector('[name="ManagerId"]');
+
+    function toggleManager() {
+    if (roleDropdown.value === "Employee") {
+    managerField.style.display = "block";
+    managerSelect.disabled = false;
+    } else {
+    managerField.style.display = "none";
+    managerSelect.value = "";
+    managerSelect.disabled = true;
+    }
+    }
+
+    roleDropdown.addEventListener("change", toggleManager);
+    toggleManager();
+</script>

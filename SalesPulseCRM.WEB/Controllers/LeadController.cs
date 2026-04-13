@@ -154,7 +154,7 @@ namespace SalesPulseCRM.WEB.Controllers
             {
                 // Admin can assign to ALL employees
                 ViewBag.Employees = await _db.Users
-                    .Where(x => x.Role == "Employee")
+                    .Where(x => x.Role == "Manager" ||  x.Role == "Employee")
                     .ToListAsync();
             }
             else if (role == "Manager")
