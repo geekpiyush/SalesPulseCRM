@@ -38,7 +38,15 @@ namespace SalesPulseCRM.WEB.Controllers
         [HttpGet]
         public IActionResult Login()
         {
-           GenerateCaptcha();
+            Response.Headers["Cache-Control"] = "no-cache, no-store, must-revalidate";
+            Response.Headers["Pragma"] = "no-cache";
+            Response.Headers["Expires"] = "0";
+
+            if (User.Identity != null && User.Identity.IsAuthenticated)
+            {
+                return RedirectToAction("Index", "Home");
+            }
+            GenerateCaptcha();
             return View();
         }
 
@@ -244,10 +252,10 @@ namespace SalesPulseCRM.WEB.Controllers
         }
 
 
-        public IActionResult Logout()
+        public async Task<IActionResult> LogoutAsync()
         {
             HttpContext.Session.Clear();
-            HttpContext.SignOutAsync("MyCookieAuth");
+            await HttpContext.SignOutAsync("MyCookieAuth");
 
             return RedirectToAction("Login", "Auth");
         }

@@ -190,3 +190,138 @@
 .delete-form {
     margin: 0;
 }
+
+/* TABLE BASE */
+.crm-table {
+    width: 100%;
+    border-collapse: collapse;
+    color: #fff;
+}
+
+    .crm-table thead {
+        background: transparent;
+        color: #94a3b8;
+        font-size: 12px;
+        text-transform: uppercase;
+    }
+
+    .crm-table th,
+    .crm-table td {
+        padding: 14px 10px;
+        border-bottom: 1px solid #1e293b;
+    }
+
+    .crm-table tbody tr {
+        transition: 0.2s;
+    }
+
+        .crm-table tbody tr:hover {
+            background: rgba(30, 41, 59, 0.5);
+        }
+
+/* ROLE BADGE */
+.badge-role {
+    padding: 4px 10px;
+    border-radius: 10px;
+    font-size: 12px;
+}
+
+    .badge-role.manager {
+        background: rgba(59,130,246,0.2);
+        color: #3b82f6;
+    }
+
+    .badge-role.employee {
+        background: rgba(34,197,94,0.2);
+        color: #22c55e;
+    }
+
+/* STATUS BADGE */
+.badge-status {
+    padding: 4px 10px;
+    border-radius: 10px;
+    font-size: 12px;
+}
+
+    .badge-status.active {
+        background: rgba(34,197,94,0.2);
+        color: #22c55e;
+    }
+
+    .badge-status.inactive {
+        background: rgba(239,68,68,0.2);
+        color: #ef4444;
+    }
+
+/* ACTION ICONS */
+.action-icons {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+    .action-icons a,
+    .action-icons button {
+        background: #020617;
+        border: 1px solid #1e293b;
+        color: #94a3b8;
+        padding: 6px 8px;
+        border-radius: 8px;
+        cursor: pointer;
+    }
+
+        .action-icons a:hover,
+        .action-icons button:hover {
+            background: #1e293b;
+            color: #fff;
+        }
+
+
+/* RESPONSIVE SWITCH */
+.mobile-view {
+    display: none;
+}
+
+.desktop-view {
+    display: block;
+}
+.dataTables_wrapper {
+    color: #fff;
+}
+
+.dataTables_filter input {
+    background: #020617;
+    border: 1px solid #1e293b;
+    color: #fff;
+    padding: 5px;
+}
+
+.dataTables_paginate .paginate_button {
+    color: #fff !important;
+}
+
+@media (max-width: 768px) {
+    .mobile-view {
+        display: block;
+    }
+
+    .desktop-view {
+        display: none;
+    }
+}
+
+/* STATUS DOT FOR TABLE */
+.status-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    display: inline-block;
+}
+
+    .status-dot.active {
+        background: #22c55e;
+    }
+
+    .status-dot.inactive {
+        background: #ef4444;
+    }

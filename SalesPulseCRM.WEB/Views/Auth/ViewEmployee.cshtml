@@ -2,94 +2,148 @@
 
 <link href="~/css/AuthController/ViewEmployees.css" rel="stylesheet" />
 
-<div class="mobile-container">
+<!-- DATATABLE CSS -->
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css" />
+<link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.4.1/css/buttons.dataTables.min.css" />
 
-    <!-- HEADER -->
-    <div class="mobile-header">
-        <h5>Employees</h5>
-        <button class="filter-btn">☰</button>
+<div class="container-fluid mt-3">
+
+    <!-- ================= DESKTOP TABLE ================= -->
+    <div class="desktop-view">
+        <table id="employeeTable" class="crm-table">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Role</th>
+                    <th>Manager</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var emp in Model)
+                {
+                    <tr>
+                        <td>@emp.Name</td>
+                        <td>@emp.Email</td>
+
+                        <td>
+                            <span class="badge-role @(emp.Role.ToLower())">
+                                @emp.Role
+                            </span>
+                        </td>
+
+                        <td>
+                            @(string.IsNullOrEmpty(emp.ManagerName) ? "Unassigned" : emp.ManagerName)
+                        </td>
+
+                        <td>
+                            <span class="badge-status @(emp.IsActive ? "active" : "inactive")">
+                                @(emp.IsActive ? "Active" : "Inactive")
+                            </span>
+                        </td>
+
+                        <td>
+                            <div class="action-icons">
+                                <a asp-action="UpdateUser" asp-route-userId="@emp.UserId" title="Edit">
+                                    ✏️
+                                </a>
+
+                                <form asp-action="DeleteUser" method="post">
+                                    <input type="hidden" name="id" value="@emp.UserId" />
+                                    <button type="submit" title="Delete">🗑️</button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
     </div>
 
-    <!-- SEARCH -->
-    <div class="search-wrapper">
-        <input type="text" id="searchInput" placeholder="Search employee..." />
-    </div>
+    <!-- ================= MOBILE CARDS ================= -->
+    <div class="mobile-view">
 
-    <!-- LIST -->
-    <div class="employee-list">
+        <div class="mobile-header">
+            <h5>Employees</h5>
+        </div>
 
-        @foreach (var emp in Model)
-        {
-            <div class="employee-card">
+        <div class="search-wrapper">
+            <input type="text" id="searchInput" placeholder="Search employee..." />
+        </div>
 
-                <div class="left">
-                    <div class="avatar">
-                        @emp.Name.Substring(0, 1)
-                    </div>
-                </div>
+        <div class="employee-list">
+            @foreach (var emp in Model)
+            {
+                <div class="employee-card">
 
-                <div class="center">
-                    <div class="name">@emp.Name</div>
-                    <div class="email">@emp.Email</div>
-
-                    <div class="meta">
-                        <span class="role @(emp.Role.ToLower())">@emp.Role</span>
-                        <span class="dot">•</span>
-                        <span class="manager">
-                            @(string.IsNullOrEmpty(emp.ManagerName) ? "No Manager" : emp.ManagerName)
-                        </span>
+                    <div class="left">
+                        <div class="avatar">
+                            @emp.Name.Substring(0, 1)
+                        </div>
                     </div>
 
-                    <!-- 🔥 ACTIONS -->
-                    <div class="card-actions">
-                        <a asp-action="UpdateUser" asp-controller="Auth" asp-route-userId="@emp.UserId" class="btn edit-btn">Edit</a>
+                    <div class="center">
+                        <div class="name">@emp.Name</div>
+                        <div class="email">@emp.Email</div>
 
-                        <form asp-action="DeleteUser" asp-controller="Auth" method="post">
-                            <input type="hidden" name="id" value="@emp.UserId" />
-                            <button type="submit" class="btn delete-btn">Delete</button>
-                        </form>
+                        <div class="meta">
+                            <span class="role @(emp.Role.ToLower())">@emp.Role</span>
+                            <span class="dot">•</span>
+                            <span class="manager">
+                                @(string.IsNullOrEmpty(emp.ManagerName) ? "No Manager" : emp.ManagerName)
+                            </span>
+                        </div>
+
+                        <div class="card-actions">
+                            <a asp-action="UpdateUser" asp-controller="Auth" asp-route-userId="@emp.UserId"
+                               class="btn edit-btn">Edit</a>
+
+                            <form asp-action="DeleteUser" asp-controller="Auth" method="post">
+                                <input type="hidden" name="id" value="@emp.UserId" />
+                                <button type="submit" class="btn delete-btn">Delete</button>
+                            </form>
+                        </div>
+                    </div>
+
+                    <div class="right">
+                        <div class="status @(emp.IsActive ? "active" : "inactive")"></div>
                     </div>
 
                 </div>
-
-                <div class="right">
-                    <div class="status @(emp.IsActive ? "active" : "inactive")"></div>
-                </div>
-
-            </div>
-        }
-
+            }
+        </div>
     </div>
 
 </div>
+
+<!-- ================= JS ================= -->
+
+<script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+
+<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.4.1/js/dataTables.buttons.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.html5.min.js"></script>
+
 <script>
-    document.getElementById("searchInput").addEventListener("keyup", function () {
-        let val = this.value.toLowerCase();
-        document.querySelectorAll(".employee-card").forEach(card => {
-            card.style.display = card.innerText.toLowerCase().includes(val)
-                ? "flex"
-                : "none";
-        });
+    // DATATABLE INIT
+    $(document).ready(function () {
+    $('#employeeTable').DataTable({
+    pageLength: 10,
+    responsive: true,
+    dom: 'Bfrtip',
+    buttons: ['copy', 'csv', 'excel', 'pdf']
+    });
     });
 
-    function toggleMenu(el, event) {
-        event.stopPropagation(); // 🔥 prevents instant close
-
-        let menu = el.nextElementSibling;
-
-        document.querySelectorAll(".dropdown-menu-custom").forEach(m => {
-            if (m !== menu) m.style.display = "none";
-        });
-
-        menu.style.display = menu.style.display === "flex" ? "none" : "flex";
-    }
-
-    /* CLOSE MENU ON OUTSIDE CLICK */
-    document.addEventListener("click", function (e) {
-        if (!e.target.closest(".actions")) {
-            document.querySelectorAll(".dropdown-menu-custom")
-                .forEach(m => m.style.display = "none");
-        }
+    // MOBILE SEARCH
+    document.getElementById("searchInput")?.addEventListener("keyup", function () {
+    let val = this.value.toLowerCase();
+    document.querySelectorAll(".employee-card").forEach(card => {
+    card.style.display = card.innerText.toLowerCase().includes(val)
+    ? "flex"
+    : "none";
     });
-
+    });
 </script>

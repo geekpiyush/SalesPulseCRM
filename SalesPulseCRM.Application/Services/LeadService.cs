@@ -61,10 +61,9 @@ namespace SalesPulseCRM.Application.Services
         {
             IQueryable<Lead> query = _db.Leads;
 
-            // 🔐 ROLE BASED FILTERING
             if (role == "Admin")
             {
-                // no filter → full access
+                // ✅ Full access (no filter)
             }
             else if (role == "Manager")
             {
@@ -73,11 +72,11 @@ namespace SalesPulseCRM.Application.Services
                     .Select(u => u.UserId)
                     .ToListAsync();
 
-                teamIds.Add(userId); // include manager's own leads
+                teamIds.Add(userId); // include manager
 
                 query = query.Where(l =>
-                    (l.CurrentAssignedTo != null && teamIds.Contains(l.CurrentAssignedTo.Value))
-                    
+                    l.CurrentAssignedTo != null &&
+                    teamIds.Contains(l.CurrentAssignedTo.Value)
                 );
             }
             else if (role == "Employee")
@@ -85,7 +84,6 @@ namespace SalesPulseCRM.Application.Services
                 query = query.Where(l => l.CurrentAssignedTo == userId);
             }
 
-            // 🔥 FINAL PROJECTION
             return await (from l in query
 
                           join u in _db.Users
@@ -111,7 +109,7 @@ namespace SalesPulseCRM.Application.Services
 
                               CreatedDate = l.CreatedDate
                           })
-                          .OrderByDescending(l => l.CreatedDate) // 🔥 important for UX
+                          .OrderByDescending(l => l.CreatedDate)
                           .ToListAsync();
         }
         public async Task<LeadEditViewModel?> GetLeadByIdAsync(int id)
