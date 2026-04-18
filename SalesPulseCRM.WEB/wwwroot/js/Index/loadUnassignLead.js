@@ -10,3 +10,4 @@
         console.log("unassigned Leads Error:", err);
     }
 }
+loadUnassignedLeads();

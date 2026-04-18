@@ -3,3 +3,4 @@
     const html = await res.text();
     document.getElementById('dashboardTimeline').innerHTML = html;
 }
+loadTimeline();

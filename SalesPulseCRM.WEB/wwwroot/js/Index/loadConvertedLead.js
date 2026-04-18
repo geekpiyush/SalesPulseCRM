@@ -7,3 +7,4 @@
     document.getElementById('convertedWeek').innerText = data.thisWeek;
     document.getElementById('convertedMonth').innerText = data.thisMonth;
 }
+loadConvertedLeads();

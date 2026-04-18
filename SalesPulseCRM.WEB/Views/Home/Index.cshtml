@@ -5,16 +5,8 @@
 <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet" />
 <link href="~/css/HomeController/HomeDashboard.css" rel="stylesheet" asp-append-version="true" />
 
-<!-- SKELETON -->
-<div id="dashboardSkeleton">
-    <div class="skeleton-card"></div>
-    <div class="skeleton-card"></div>
-    <div class="skeleton-card"></div>
-    <div class="skeleton-card"></div>
-</div>
 
 <!-- REAL DASHBOARD -->
-<div id="dashboardContent" style="display:none;">
     <div class="container-fluid dashboard">
 
         <!-- 🔥 TODAY TASKS (ACTIONABLE) -->
@@ -455,33 +447,10 @@
         </div>
 
     </div>
-</div>
+
 
 <script src="~/js/index/loadConvertedLead.js"></script>
 <script src="~/js/index/loadLeadCount.js"></script>
 <script src="~/js/index/loadLeedFunnel.js"></script>
 <script src="~/js/index/loadTimeline.js"></script>
 <script src="~/js/index/loadUnassignLead.js"></script>
-<script>
-
-        async function loadDashboard() {
-        try {
-            await Promise.all([
-                loadLeadsCount(),
-                loadUnassignedLeads(),
-                loadConvertedLeads(),
-                loadLeadFunnel(),
-                loadTimeline()
-            ]);
-
-            // AFTER ALL DATA LOADED
-            document.getElementById("dashboardSkeleton").style.display = "none";
-            document.getElementById("dashboardContent").style.display = "block";
-
-        } catch (err) {
-            console.error("Dashboard Load Failed:", err);
-        }
-    }
-
-    loadDashboard();
-</script>

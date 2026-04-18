@@ -11,3 +11,4 @@
         console.error("Error loading leads count:", err);
     }
 }
+loadLeadsCount();

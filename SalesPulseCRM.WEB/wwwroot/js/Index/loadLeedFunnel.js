@@ -26,3 +26,4 @@
         console.error("Lead Funnel Load Failed:", err);
     }
 }
+loadLeadFunnel();
