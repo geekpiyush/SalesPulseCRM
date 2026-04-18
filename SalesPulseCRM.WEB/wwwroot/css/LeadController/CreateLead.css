@@ -166,3 +166,20 @@ select.input-modern {
         padding: 20px 10px;
     }
 }
+.valid-row {
+    background-color: #e6ffed;
+}
+
+.invalid-row {
+    background-color: #ffe6e6;
+}
+
+.status-valid {
+    color: green;
+    font-weight: 600;
+}
+
+.status-invalid {
+    color: red;
+    font-weight: 600;
+}

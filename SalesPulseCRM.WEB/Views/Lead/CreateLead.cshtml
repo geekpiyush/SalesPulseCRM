@@ -13,7 +13,7 @@
                 Manual Entry
             </button>
             <button type="button" class="btn btn-outline-primary" id="importBtn">
-                Import CSV
+                Import Leads
             </button>
         </div>
     </div>
@@ -164,14 +164,16 @@
                 <div id="fileName" class="small text-success mb-2"></div>
 
                 <!-- Action -->
-                <button class="btn btn-success px-4">
+                <button id="uploadBtn" class="btn btn-success px-4">
                     Upload & Import
                 </button>
 
+                <div id="importResult" class="mt-3"></div>
+
                 <!-- Template -->
                 <div class="mt-3">
-                    <a href="/Lead/DownloadTemplate" class="small text-info">
-                        ⬇ Download CSV Template
+                    <a asp-action="DownloadSampleFile" asp-controller="LeadApi" class="small text-info">
+                        ⬇ Download CSV / Excel Template
                     </a>
                 </div>
 
@@ -271,6 +273,69 @@
             }, 500);
         });
     }, 2000); // 2 sec
+
+        const uploadBtn = document.getElementById("uploadBtn");
+
+    uploadBtn.addEventListener("click", async function () {
+
+        if (fileInput.files.length === 0) {
+            alert("Please select a file first");
+            return;
+        }
+
+        const file = fileInput.files[0];
+
+        const formData = new FormData();
+        formData.append("file", file);
+
+        // UI loading state
+        uploadBtn.disabled = true;
+        uploadBtn.innerText = "Uploading...";
+
+        try {
+            const response = await fetch("/api/leadapi/import-leads", {
+                method: "POST",
+                body: formData
+            });
+
+            const result = await response.json();
+    const resultDiv = document.getElementById("importResult");
+
+    if (response.ok) {
+
+        let html = `
+            <div class="alert alert-info">
+                <strong>Import Summary:</strong><br/>
+                ✅ Success: ${result.successCount}<br/>
+                ❌ Errors: ${result.errorCount}
+            </div>
+        `;
+
+        if (result.errors && result.errors.length > 0) {
+            html += `<div class="alert alert-danger">
+                        <strong>Error Details:</strong>
+                        <ul style="max-height:200px; overflow:auto;">`;
+
+            result.errors.forEach(e => {
+                html += `<li>${e}</li>`;
+            });
+
+            html += `</ul></div>`;
+        }
+
+        resultDiv.innerHTML = html;
+    }else {
+                alert("❌ Failed: " + result);
+            }
+        } catch (err) {
+            console.error(err);
+            alert("Something went wrong");
+        } finally {
+            uploadBtn.disabled = false;
+            uploadBtn.innerText = "Upload & Import";
+        }
+    });
+      
 </script>
 
 

@@ -1,10 +1,24 @@
 ﻿using Hangfire;
 using Microsoft.EntityFrameworkCore;
+using OfficeOpenXml;
+using OfficeOpenXml;
 using SalesPulseCRM.Application.ServiceContracts;
 using SalesPulseCRM.Application.Services;
 using SalesPulseCRM.Infrastructure.DB;
+using System.ComponentModel;
+
 
 var builder = WebApplication.CreateBuilder(args);
+
+ExcelPackage.License.SetNonCommercialPersonal("Piyush");
+
+builder.Host.ConfigureLogging(logginProvider => { 
+    logginProvider.ClearProviders();
+    logginProvider.AddConsole();
+    logginProvider.AddDebug();
+    logginProvider.AddEventLog();
+
+});
 
 // MVC
 builder.Services.AddControllersWithViews();
@@ -45,7 +59,6 @@ builder.Services.AddAuthentication("MyCookieAuth")
 
 builder.Services.AddScoped<EmailServices>();
 
-
 var app = builder.Build(); 
 
 // Error handling
@@ -73,5 +86,6 @@ app.UseHangfireDashboard();
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Auth}/{action=Login}/{id?}");
+
 
 app.Run();

@@ -618,6 +618,26 @@
     font-size: 12px;
     color: #ef4444;
 }
+
+.skeleton-card {
+    height: 120px;
+    border-radius: 12px;
+    background: linear-gradient( 90deg, #eee 25%, #ddd 37%, #eee 63% );
+    background-size: 400% 100%;
+    animation: skeleton-loading 1.4s ease infinite;
+    margin-bottom: 15px;
+}
+
+@keyframes skeleton-loading {
+    0% {
+        background-position: 100% 0
+    }
+
+    100% {
+        background-position: 0 0
+    }
+}
+
 /* 🔥 MOBILE IMPROVEMENTS */
 @media (max-width: 576px) {
     .funnel-step {

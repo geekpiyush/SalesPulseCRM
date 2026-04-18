@@ -1,4 +1,7 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Hangfire.States;
+using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
+using OfficeOpenXml;
 using SalesPulseCRM.Application.DTOs;
 using SalesPulseCRM.Application.ServiceContracts;
 using SalesPulseCRM.Domain.Entities;
@@ -6,8 +9,10 @@ using SalesPulseCRM.Domain.Enum;
 using SalesPulseCRM.Infrastructure.DB;
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace SalesPulseCRM.Application.Services
@@ -731,6 +736,172 @@ namespace SalesPulseCRM.Application.Services
         public Task<List<UserTaskDto>> GetTodayTasksAsync(int userId, string role)
         {
             throw new NotImplementedException();
+        }
+
+        public async Task<MemoryStream> GetExcelImportFile()
+        {
+            var memoryStream = new MemoryStream();
+
+            using (var package = new ExcelPackage())
+            {
+                // 🔹 Main Sheet
+                var worksheet = package.Workbook.Worksheets.Add("ImportLeads");
+
+                worksheet.Cells["A1"].Value = "CustomerName";
+                worksheet.Cells["B1"].Value = "Phone";
+                worksheet.Cells["C1"].Value = "Email";
+                worksheet.Cells["D1"].Value = "State";
+                worksheet.Cells["E1"].Value = "City";
+                worksheet.Cells["F1"].Value = "Project";
+                worksheet.Cells["G1"].Value = "Source";
+
+                using (var header = worksheet.Cells["A1:G1"])
+                {
+                    header.Style.Fill.PatternType = OfficeOpenXml.Style.ExcelFillStyle.Solid;
+                    header.Style.Fill.BackgroundColor.SetColor(Color.LightBlue);
+                    header.Style.Font.Bold = true;
+                }
+
+                // 🔹 Sample row
+                worksheet.Cells[2, 1].Value = "Piyush";
+                worksheet.Cells[2, 2].Value = "9876543210";
+                worksheet.Cells[2, 3].Value = "test@gmail.com";
+
+                worksheet.Cells["A1:G2"].AutoFitColumns();
+
+                // 🔴 Hidden Lookup Sheet
+                var lookupSheet = package.Workbook.Worksheets.Add("Lookup");
+
+                var states = _db.States.Select(x => x.StateName).ToList();
+                var cities = _db.Cities.Select(x => x.CityName).ToList();
+                var projects = _db.Projects.Select(x => x.ProjectName).ToList();
+                var sources = _db.LeadSources.Select(x => x.SourceName).ToList();
+
+                // Fill lookup data
+                for (int i = 0; i < states.Count; i++)
+                    lookupSheet.Cells[i + 1, 1].Value = states[i];
+
+                for (int i = 0; i < cities.Count; i++)
+                    lookupSheet.Cells[i + 1, 2].Value = cities[i];
+
+                for (int i = 0; i < projects.Count; i++)
+                    lookupSheet.Cells[i + 1, 3].Value = projects[i];
+
+                for (int i = 0; i < sources.Count; i++)
+                    lookupSheet.Cells[i + 1, 4].Value = sources[i];
+
+                // 🔴 Hide lookup sheet
+                lookupSheet.Hidden = OfficeOpenXml.eWorkSheetHidden.VeryHidden;
+
+                // 🔹 Add dropdown validations
+
+                var stateValidation = worksheet.DataValidations.AddListValidation("D2:D1000");
+                stateValidation.Formula.ExcelFormula = $"Lookup!A1:A{states.Count}";
+
+                var cityValidation = worksheet.DataValidations.AddListValidation("E2:E1000");
+                cityValidation.Formula.ExcelFormula = $"Lookup!B1:B{cities.Count}";
+
+                var projectValidation = worksheet.DataValidations.AddListValidation("F2:F1000");
+                projectValidation.Formula.ExcelFormula = $"Lookup!C1:C{projects.Count}";
+
+                var sourceValidation = worksheet.DataValidations.AddListValidation("G2:G1000");
+                sourceValidation.Formula.ExcelFormula = $"Lookup!D1:D{sources.Count}";
+
+                await package.SaveAsAsync(memoryStream);
+            }
+
+            memoryStream.Position = 0;
+            return memoryStream;
+        }
+
+        public async Task<(int successCount, List<string> errors)> ImportLeadsFromExcel(IFormFile file)
+        {
+            var errors = new List<string>();
+            var leads = new List<ImportLeadDto>();
+            using var stream = new MemoryStream();
+            await file.CopyToAsync(stream);
+
+            using var package = new ExcelPackage(stream);
+
+            var worksheet = package.Workbook.Worksheets.FirstOrDefault();
+
+            if (worksheet == null)
+            {
+                throw new Exception("Worksheet was not found");
+            }
+
+            int rowCount = worksheet.Dimension.Rows;
+            //check duplicate number inside excel file
+            var excelPhone = new HashSet<string>();
+
+            //load all existing phonenumber from db
+            var existingNumber =  _db.Leads.Select(x => x.Phone).ToHashSet();
+
+            for (int row = 2; row <= rowCount; row++)
+            {
+                try
+                {
+                    var importDto = new ImportLeadDto
+                    {
+                        CustomerName = worksheet.Cells[row, 1].Text?.Trim(),
+                        Phone = worksheet.Cells[row, 2].Text?.Trim(),
+                        Email = worksheet.Cells[row, 3].Text?.Trim(),
+                        State = worksheet.Cells[row, 4].Text?.Trim(),
+                        City = worksheet.Cells[row, 5].Text?.Trim(),
+                        Project = worksheet.Cells[row, 6].Text?.Trim(),
+                        Source = worksheet.Cells[row, 7].Text?.Trim()
+                    };
+
+                    if(string.IsNullOrWhiteSpace(importDto.CustomerName))
+                    {
+                        throw new Exception("Customer name is requried");
+                    }
+                    if (string.IsNullOrWhiteSpace(importDto.Phone))
+                        throw new Exception("Phone is required");
+
+                    if (importDto.Phone.Length != 10)
+                        throw new Exception("Invalid phone");
+
+                    if (!excelPhone.Add(importDto.Phone))
+                        throw new Exception($"Duplicate number in file: {importDto.Phone}");
+
+                    if (existingNumber.Contains(importDto.Phone))
+                        throw new Exception($"Duplicate phone in system: {importDto.Phone}");
+
+                    leads.Add(importDto);
+                }
+                catch (Exception ex)
+                {
+                    errors.Add($"Row {row} : {ex.Message}");
+                }
+            }
+
+            if(leads.Any())
+            {
+                var states = _db.States.ToDictionary(x => x.StateName.ToLower(), x => x.StateId);
+                var cities = _db.Cities.ToDictionary(x => x.CityName.ToLower(), x => x.CityId);
+                var projects = _db.Projects.ToDictionary(x => x.ProjectName.ToLower(), x => x.ProjectId);
+                var sources = _db.LeadSources.ToDictionary(x => x.SourceName.ToLower(), x => x.LeadSourceId);
+
+                var entities = leads.Select(lead => new Lead
+                {
+                    CustomerName = lead.CustomerName,
+                    Phone = lead.Phone,
+                    Email = lead.Email,
+                   
+                    StateId = states.ContainsKey(lead.State.ToLower()) ? states[lead.State.ToLower()] : null,
+                    CityId = cities.ContainsKey(lead.City.ToLower()) ? cities[lead.City.ToLower()] : null,
+                    ProjectId = projects.ContainsKey(lead.Project.ToLower()) ? projects[lead.Project.ToLower()] : null,
+                    LeadSourceId = sources.ContainsKey(lead.Source.ToLower()) ? sources[lead.Source.ToLower()] : null,
+                    LeadStatusId =  1,
+                    CreatedDate = DateTime.Now
+                }).ToList();
+
+                _db.Leads.AddRange(entities);
+                await _db.SaveChangesAsync();
+            }
+            return (leads.Count, errors);
+
         }
     }
 }

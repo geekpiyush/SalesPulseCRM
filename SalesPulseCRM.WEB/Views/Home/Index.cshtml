@@ -5,527 +5,483 @@
 <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet" />
 <link href="~/css/HomeController/HomeDashboard.css" rel="stylesheet" asp-append-version="true" />
 
-<div class="container-fluid dashboard">
-
-    <!-- 🔥 TODAY TASKS (ACTIONABLE) -->
-    <div class="row g-3 mb-4">
-        <!-- 🔥 TOTAL LEADS -->
-        <div class="col-12 col-sm-6 col-lg-3">
-            <div class="card-box">
-
-                <div class="card-icon bg-purple">
-                    <i class="bi bi-people"></i>
-                </div>
-
-                <div class="w-100">
-                    <div class="card-title">Total Leads</div>
-
-                    <div class="card-value">
-                        <span class="clickable-card text-success"
-                              onclick="goToLeads('active')">
-                            Active: <strong id="activeLeads">0</strong>
-                        </span>
-
-                        <span class="clickable-card text-danger"
-                              onclick="goToLeads('dead')">
-                            Lost: <strong id="deadLeads">0</strong>
-                        </span>
-                    </div>
-                </div>
-
-            </div>
-        </div>
-
-        <!-- 🔥 UNASSIGNED -->
-        <div class="col-12 col-sm-6 col-lg-3">
-            <div class="card-box">
-
-                <div class="card-icon bg-red">
-                    <i class="bi bi-person-x"></i>
-                </div>
-
-                <div class="w-100">
-
-                    <div class="card-title">Unassigned Leads</div>
-
-                    <!-- 🔥 MAIN VALUE -->
-                    <div class="card-value clickable-card"
-                         id="totalUnassigned"
-                         onclick="goToLeads('unassigned')">
-                        0
-                    </div>
-
-                    <!-- 🔥 BREAKDOWN -->
-                    <div class="unassigned-breakdown mt-2">
-
-                        <div class="mini-item clickable-row"
-                             onclick="goToLeads('unassigned-today')">
-                            <span>Today</span>
-                            <span id="todayUnassigned">0</span>
-                        </div>
-
-                        <div class="mini-item clickable-row warning"
-                             onclick="goToLeads('unassigned-old')">
-                            <span>1+ Days</span>
-                            <span id="oldUnassigned">0</span>
-                        </div>
-
-                    </div>
-
-                    <!-- 🔥 CTA -->
-                    <div class="assign-cta mt-2"
-                         onclick="goToLeads('unassigned')">
-                        Assign Now →
-                    </div>
-
-                </div>
-
-            </div>
-        </div>
-
-
-        <!-- 🔥 CONVERTED -->
-        <div class="col-12 col-sm-6 col-lg-3">
-            <div class="card-box">
-
-                <div class="card-icon bg-green">
-                    <i class="bi bi-check-circle"></i>
-                </div>
-
-                <div class="w-100">
-
-                    <div class="card-title">Converted</div>
-
-                    <!-- 🔥 MAIN VALUE -->
-                    <div class="card-value clickable-card"
-                         id="convertedTotal"
-                         onclick="goToLeads('converted-month')">
-                        0
-                    </div>
-
-                    <!-- 🔥 BREAKDOWN -->
-                    <div class="converted-breakdown mt-2">
-
-                        <div class="mini-item clickable-row"
-                             onclick="goToLeads('converted-today')">
-                            <span>Today</span>
-                            <span id="convertedToday">0</span>
-                        </div>
-
-                        <div class="mini-item clickable-row"
-                             onclick="goToLeads('converted-week')">
-                            <span>This Week</span>
-                            <span id="convertedWeek">0</span>
-                        </div>
-
-                        <div class="mini-item clickable-row"
-                             onclick="goToLeads('converted-month')">
-                            <span>This Month</span>
-                            <span id="convertedMonth">0</span>
-                        </div>
-
-                    </div>
-
-                </div>
-
-            </div>
-        </div>
-
-        <div class="col-12 col-sm-6 col-lg-3">
-            <div class="card-box">
-
-                <div class="card-icon bg-blue">
-                    <i class="bi bi-list-check"></i>
-                </div>
-
-                <div class="w-100">
-                    <div class="card-title">Today Tasks</div>
-                    <div class="task-breakdown mt-2">
-
-                        <div class="task-item clickable-row"
-                             onclick="goToFollowups('today')">
-                            <span>Followups</span>
-                            <span class="count" id="followupsCount">0</span>
-                        </div>
-
-                        <div class="task-item clickable-row overdue"
-                             onclick="goToFollowups('overdue')">
-                            <span>Missed</span>
-                            <span class="count" id="missedCount">0</span>
-                        </div>
-
-                        <div class="task-item clickable-row meeting"
-                             onclick="goToMeetings()">
-                            <span>Meetings</span>
-                            <span class="count" id="meetingsCount">0</span>
-                        </div>
-
-                    </div>
-                </div>
-
-            </div>
-        </div>
-
-
-
-    </div>
-    <div class="section-divider"></div>
-
-    <div class="card-clean mb-4">
-        <h5 class="mb-3">Lead Funnel</h5>
-
-        <div class="funnel-grid">
-
-            <div class="funnel-center">
-
-                <!-- 🔥 TOTAL ACTIVE -->
-                <div class="funnel-step root clickable-card" onclick="goToLeads('active')">
-                    <div class="funnel-value" id="totalActive">0</div>
-                    <div class="funnel-label">Active Leads</div>
-                </div>
-
-                <!-- 🔥 ACTIVE BREAKDOWN -->
-                <div class="funnel-state-grid">
-                    <div class="state-item" onclick="goToLeads('Attempted Contact')">
-                        <span id="attemptedContact">0</span>
-                        <small>Attempted Contact</small>
-                    </div>
-
-                    <div class="state-item" onclick="goToLeads('Needs Follow-up')">
-                        <span id="needsFollowUp">0</span>
-                        <small>Needs Follow-up</small>
-                    </div>
-
-                    <div class="state-item" onclick="goToLeads('Callback Scheduled')">
-                        <span id="callbackScheduled">0</span>
-                        <small>Callback Scheduled</small>
-                    </div>
-
-                    <div class="state-item" onclick="goToLeads('On Hold')">
-                        <span id="onHold">0</span>
-                        <small>On Hold</small>
-                    </div>
-
-                    <div class="state-item success" onclick="goToLeads('Interested')">
-                        <span id="interested">0</span>
-                        <small>Interested</small>
-                    </div>
-
-                </div>
-
-            </div>
-
-            <!-- POSITIVE -->
-            <div class="funnel-col positive">
-                <h6 class="branch-title text-success">Positive</h6>
-
-                <div class="funnel-step">
-                    <span id="contacted">0</span> <span>Contacted</span>
-                </div>
-
-                <div class="funnel-step">
-                    <span id="qualified">0</span> <span>Qualified</span>
-                </div>
-
-                <div class="funnel-step success">
-                    <span id="converted">0</span> <span>Converted</span>
-                </div>
-            </div>
-
-            <!-- NEGATIVE -->
-            <div class="funnel-col negative">
-                <h6 class="branch-title text-danger">Drop-offs</h6>
-
-                <div class="funnel-step danger">
-                    <span id="noResponse">0</span> <span>No Response</span>
-                </div>
-
-                <div class="funnel-step danger">
-                    <span id="notInterested">0</span> <span>Not Interested</span>
-                </div>
-
-                <div class="funnel-step danger">
-                    <span id="lost">0</span> <span>Lost</span>
-                </div>
-            </div>
-
-        </div>
-    </div>
-
-    <div class="section-divider"></div>
-
-    <!-- 🔥 SECOND ROW -->
-    <div class="row g-3">
-
-        <!-- 👤 USERS -->
-        <div class="col-12 col-lg-6">
-            <div class="card-clean assigned-card">
-                <h5 class="mb-3">Assigned Leads</h5>
-
-                <div class="assigned-scroll">
-
-                <!-- 🔥 USER -->
-                <div class="user-card clickable-row"
-                     onclick="goToUserLeads(1)">
-
-                    <div class="user-left">
-                        <div class="user-avatar">P</div>
-
-                        <div>
-                            <div class="user-name">Piyush</div>
-                            <div class="user-meta">
-                                5 overdue • 2 today
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="user-right">
-                        <div class="user-count">45</div>
-                        <div class="user-label">leads</div>
-                    </div>
-
-                </div>
-                      <div class="user-card clickable-row"
-                     onclick="goToUserLeads(1)">
-
-                    <div class="user-left">
-                        <div class="user-avatar">P</div>
-
-                        <div>
-                            <div class="user-name">Piyush</div>
-                            <div class="user-meta">
-                                5 overdue • 2 today
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="user-right">
-                        <div class="user-count">45</div>
-                        <div class="user-label">leads</div>
-                    </div>
-
-                </div>
-
-                    <div class="user-card clickable-row"
-                         onclick="goToUserLeads(1)">
-
-                        <div class="user-left">
-                            <div class="user-avatar">P</div>
-
-                            <div>
-                                <div class="user-name">Piyush</div>
-                                <div class="user-meta">
-                                    5 overdue • 2 today
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="user-right">
-                            <div class="user-count">45</div>
-                            <div class="user-label">leads</div>
-                        </div>
-
-                    </div>
-
-                    <div class="user-card clickable-row"
-                         onclick="goToUserLeads(1)">
-
-                        <div class="user-left">
-                            <div class="user-avatar">P</div>
-
-                            <div>
-                                <div class="user-name">Piyush</div>
-                                <div class="user-meta">
-                                    5 overdue • 2 today
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="user-right">
-                            <div class="user-count">45</div>
-                            <div class="user-label">leads</div>
-                        </div>
-
-                    </div>
-
-
-                <!-- 🔥 USER -->
-                <div class="user-card clickable-row"
-                     onclick="goToUserLeads(2)">
-
-                    <div class="user-left">
-                        <div class="user-avatar">R</div>
-
-                        <div>
-                            <div class="user-name">Rahul</div>
-                            <div class="user-meta text-success">
-                                All on track
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="user-right">
-                        <div class="user-count">32</div>
-                        <div class="user-label">leads</div>
-                    </div>
-
-                </div>
-             </div>
-            </div>
-        </div>
-
-        <!-- ⏳ AGING -->
-        <div class="col-12 col-lg-6">
-            <div class="card-clean">
-                <div class="aging-header">
-                    <h5>Lead Aging</h5>
-                    <span class="aging-total">83 Leads</span>
-                </div>
-
-                <!-- 🔥 PROGRESS BAR -->
-                <div class="aging-bar">
-                    <div class="bar safe" style="width:48%"></div>
-                    <div class="bar warning" style="width:30%"></div>
-                    <div class="bar danger" style="width:22%"></div>
-                </div>
-
-                <!-- 🔥 ROWS -->
-                <div class="aging-card safe clickable-row" onclick="goToLeads('aging-0-2')">
-                    <div class="aging-left">
-                        <div class="aging-dot safe"></div>
-                        <span>0-2 Days</span>
-                    </div>
-                    <div class="aging-right">
-                        <span class="count">40</span>
-                        <span class="status safe-text">Healthy • 48%</span>
-                    </div>
-                </div>
-
-                <div class="aging-card warning clickable-row" onclick="goToLeads('aging-3-7')">
-                    <div class="aging-left">
-                        <div class="aging-dot warning"></div>
-                        <span>3-7 Days</span>
-                    </div>
-                    <div class="aging-right">
-                        <span class="count">25</span>
-                        <span class="status warning-text">Attention • 30%</span>
-                    </div>
-                </div>
-
-                <div class="aging-card danger clickable-row" onclick="goToLeads('aging-7+')">
-                    <div class="aging-left">
-                        <div class="aging-dot danger"></div>
-                        <span>7+ Days</span>
-                    </div>
-                    <div class="aging-right">
-                        <span class="count">18</span>
-                        <span class="status danger-text">Critical • 22%</span>
-                    </div>
-                </div>
-
-                <!-- 🔥 ALERT -->
-                <div class="aging-alert">
-                    ⚠️ 18 leads need immediate action
-                </div>
-            </div>
-        </div>
-
-    </div>
-
-    <div class="section-divider"></div>
-
-    <!-- 🔥 TIMELINE -->
-    <div class="card-clean mt-4">
-        <h5 class="mb-3">Recent Activity</h5>
-
-        <div id="dashboardTimeline">
-            <!-- 🔥 PARTIAL LOAD -->
-           
-        </div>
-    </div>
-
+<!-- SKELETON -->
+<div id="dashboardSkeleton">
+    <div class="skeleton-card"></div>
+    <div class="skeleton-card"></div>
+    <div class="skeleton-card"></div>
+    <div class="skeleton-card"></div>
 </div>
-<script>
-      fetch('/Lead/GetTimelinePartial?leadId=0')
-    .then(res => res.text())
-    .then(html => {
-        document.getElementById('dashboardTimeline').innerHTML = html;
-    });
-    
 
-       async function loadLeadsCount() {
-        try {
-            const res = await fetch('/api/leadapi/leads-count'); 
-            const data = await res.json();
+<!-- REAL DASHBOARD -->
+<div id="dashboardContent" style="display:none;">
+    <div class="container-fluid dashboard">
 
+        <!-- 🔥 TODAY TASKS (ACTIONABLE) -->
+        <div class="row g-3 mb-4">
+            <!-- 🔥 TOTAL LEADS -->
+            <div class="col-12 col-sm-6 col-lg-3">
+                <div class="card-box">
+
+                    <div class="card-icon bg-purple">
+                        <i class="bi bi-people"></i>
+                    </div>
+
+                    <div class="w-100">
+                        <div class="card-title">Total Leads</div>
+
+                        <div class="card-value">
+                            <span class="clickable-card text-success"
+                                  onclick="goToLeads('active')">
+                                Active: <strong id="activeLeads">0</strong>
+                            </span>
+
+                            <span class="clickable-card text-danger"
+                                  onclick="goToLeads('dead')">
+                                Lost: <strong id="deadLeads">0</strong>
+                            </span>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- 🔥 UNASSIGNED -->
+            <div class="col-12 col-sm-6 col-lg-3">
+                <div class="card-box">
+
+                    <div class="card-icon bg-red">
+                        <i class="bi bi-person-x"></i>
+                    </div>
+
+                    <div class="w-100">
+
+                        <div class="card-title">Unassigned Leads</div>
+
+                        <!-- 🔥 MAIN VALUE -->
+                        <div class="card-value clickable-card"
+                             id="totalUnassigned"
+                             onclick="goToLeads('unassigned')">
+                            0
+                        </div>
+
+                        <!-- 🔥 BREAKDOWN -->
+                        <div class="unassigned-breakdown mt-2">
+
+                            <div class="mini-item clickable-row"
+                                 onclick="goToLeads('unassigned-today')">
+                                <span>Today</span>
+                                <span id="todayUnassigned">0</span>
+                            </div>
+
+                            <div class="mini-item clickable-row warning"
+                                 onclick="goToLeads('unassigned-old')">
+                                <span>1+ Days</span>
+                                <span id="oldUnassigned">0</span>
+                            </div>
+
+                        </div>
+
+                        <!-- 🔥 CTA -->
+                        <div class="assign-cta mt-2"
+                             onclick="goToLeads('unassigned')">
+                            Assign Now →
+                        </div>
+
+                    </div>
+
+                </div>
+            </div>
+
+
+            <!-- 🔥 CONVERTED -->
+            <div class="col-12 col-sm-6 col-lg-3">
+                <div class="card-box">
+
+                    <div class="card-icon bg-green">
+                        <i class="bi bi-check-circle"></i>
+                    </div>
+
+                    <div class="w-100">
+
+                        <div class="card-title">Converted</div>
+
+                        <!-- 🔥 MAIN VALUE -->
+                        <div class="card-value clickable-card"
+                             id="convertedTotal"
+                             onclick="goToLeads('converted-month')">
+                            0
+                        </div>
+
+                        <!-- 🔥 BREAKDOWN -->
+                        <div class="converted-breakdown mt-2">
+
+                            <div class="mini-item clickable-row"
+                                 onclick="goToLeads('converted-today')">
+                                <span>Today</span>
+                                <span id="convertedToday">0</span>
+                            </div>
+
+                            <div class="mini-item clickable-row"
+                                 onclick="goToLeads('converted-week')">
+                                <span>This Week</span>
+                                <span id="convertedWeek">0</span>
+                            </div>
+
+                            <div class="mini-item clickable-row"
+                                 onclick="goToLeads('converted-month')">
+                                <span>This Month</span>
+                                <span id="convertedMonth">0</span>
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="col-12 col-sm-6 col-lg-3">
+                <div class="card-box">
+
+                    <div class="card-icon bg-blue">
+                        <i class="bi bi-list-check"></i>
+                    </div>
+
+                    <div class="w-100">
+                        <div class="card-title">Today Tasks</div>
+                        <div class="task-breakdown mt-2">
+
+                            <div class="task-item clickable-row"
+                                 onclick="goToFollowups('today')">
+                                <span>Followups</span>
+                                <span class="count" id="followupsCount">0</span>
+                            </div>
+
+                            <div class="task-item clickable-row overdue"
+                                 onclick="goToFollowups('overdue')">
+                                <span>Missed</span>
+                                <span class="count" id="missedCount">0</span>
+                            </div>
+
+                            <div class="task-item clickable-row meeting"
+                                 onclick="goToMeetings()">
+                                <span>Meetings</span>
+                                <span class="count" id="meetingsCount">0</span>
+                            </div>
+
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+
+
+        </div>
+        <div class="section-divider"></div>
+
+        <div class="card-clean mb-4">
+            <h5 class="mb-3">Lead Funnel</h5>
+
+            <div class="funnel-grid">
+
+                <div class="funnel-center">
+
+                    <!-- 🔥 TOTAL ACTIVE -->
+                    <div class="funnel-step root clickable-card" onclick="goToLeads('active')">
+                        <div class="funnel-value" id="totalActive">0</div>
+                        <div class="funnel-label">Active Leads</div>
+                    </div>
+
+                    <!-- 🔥 ACTIVE BREAKDOWN -->
+                    <div class="funnel-state-grid">
+                        <div class="state-item" onclick="goToLeads('Attempted Contact')">
+                            <span id="attemptedContact">0</span>
+                            <small>Attempted Contact</small>
+                        </div>
+
+                        <div class="state-item" onclick="goToLeads('Needs Follow-up')">
+                            <span id="needsFollowUp">0</span>
+                            <small>Needs Follow-up</small>
+                        </div>
+
+                        <div class="state-item" onclick="goToLeads('Callback Scheduled')">
+                            <span id="callbackScheduled">0</span>
+                            <small>Callback Scheduled</small>
+                        </div>
+
+                        <div class="state-item" onclick="goToLeads('On Hold')">
+                            <span id="onHold">0</span>
+                            <small>On Hold</small>
+                        </div>
+
+                        <div class="state-item success" onclick="goToLeads('Interested')">
+                            <span id="interested">0</span>
+                            <small>Interested</small>
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <!-- POSITIVE -->
+                <div class="funnel-col positive">
+                    <h6 class="branch-title text-success">Positive</h6>
+
+                    <div class="funnel-step">
+                        <span id="contacted">0</span> <span>Contacted</span>
+                    </div>
+
+                    <div class="funnel-step">
+                        <span id="qualified">0</span> <span>Qualified</span>
+                    </div>
+
+                    <div class="funnel-step success">
+                        <span id="converted">0</span> <span>Converted</span>
+                    </div>
+                </div>
+
+                <!-- NEGATIVE -->
+                <div class="funnel-col negative">
+                    <h6 class="branch-title text-danger">Drop-offs</h6>
+
+                    <div class="funnel-step danger">
+                        <span id="noResponse">0</span> <span>No Response</span>
+                    </div>
+
+                    <div class="funnel-step danger">
+                        <span id="notInterested">0</span> <span>Not Interested</span>
+                    </div>
+
+                    <div class="funnel-step danger">
+                        <span id="lost">0</span> <span>Lost</span>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="section-divider"></div>
+
+        <!-- 🔥 SECOND ROW -->
+        <div class="row g-3">
+
+            <!-- 👤 USERS -->
+            <div class="col-12 col-lg-6">
+                <div class="card-clean assigned-card">
+                    <h5 class="mb-3">Assigned Leads</h5>
+
+                    <div class="assigned-scroll">
+
+                        <!-- 🔥 USER -->
+                        <div class="user-card clickable-row"
+                             onclick="goToUserLeads(1)">
+
+                            <div class="user-left">
+                                <div class="user-avatar">P</div>
+
+                                <div>
+                                    <div class="user-name">Piyush</div>
+                                    <div class="user-meta">
+                                        5 overdue • 2 today
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="user-right">
+                                <div class="user-count">45</div>
+                                <div class="user-label">leads</div>
+                            </div>
+
+                        </div>
+                        <div class="user-card clickable-row"
+                             onclick="goToUserLeads(1)">
+
+                            <div class="user-left">
+                                <div class="user-avatar">P</div>
+
+                                <div>
+                                    <div class="user-name">Piyush</div>
+                                    <div class="user-meta">
+                                        5 overdue • 2 today
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="user-right">
+                                <div class="user-count">45</div>
+                                <div class="user-label">leads</div>
+                            </div>
+
+                        </div>
+
+                        <div class="user-card clickable-row"
+                             onclick="goToUserLeads(1)">
+
+                            <div class="user-left">
+                                <div class="user-avatar">P</div>
+
+                                <div>
+                                    <div class="user-name">Piyush</div>
+                                    <div class="user-meta">
+                                        5 overdue • 2 today
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="user-right">
+                                <div class="user-count">45</div>
+                                <div class="user-label">leads</div>
+                            </div>
+
+                        </div>
+
+                        <div class="user-card clickable-row"
+                             onclick="goToUserLeads(1)">
+
+                            <div class="user-left">
+                                <div class="user-avatar">P</div>
+
+                                <div>
+                                    <div class="user-name">Piyush</div>
+                                    <div class="user-meta">
+                                        5 overdue • 2 today
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="user-right">
+                                <div class="user-count">45</div>
+                                <div class="user-label">leads</div>
+                            </div>
+
+                        </div>
+
+
+                        <!-- 🔥 USER -->
+                        <div class="user-card clickable-row"
+                             onclick="goToUserLeads(2)">
+
+                            <div class="user-left">
+                                <div class="user-avatar">R</div>
+
+                                <div>
+                                    <div class="user-name">Rahul</div>
+                                    <div class="user-meta text-success">
+                                        All on track
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="user-right">
+                                <div class="user-count">32</div>
+                                <div class="user-label">leads</div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ⏳ AGING -->
+            <div class="col-12 col-lg-6">
+                <div class="card-clean">
+                    <div class="aging-header">
+                        <h5>Lead Aging</h5>
+                        <span class="aging-total">83 Leads</span>
+                    </div>
+
+                    <!-- 🔥 PROGRESS BAR -->
+                    <div class="aging-bar">
+                        <div class="bar safe" style="width:48%"></div>
+                        <div class="bar warning" style="width:30%"></div>
+                        <div class="bar danger" style="width:22%"></div>
+                    </div>
+
+                    <!-- 🔥 ROWS -->
+                    <div class="aging-card safe clickable-row" onclick="goToLeads('aging-0-2')">
+                        <div class="aging-left">
+                            <div class="aging-dot safe"></div>
+                            <span>0-2 Days</span>
+                        </div>
+                        <div class="aging-right">
+                            <span class="count">40</span>
+                            <span class="status safe-text">Healthy • 48%</span>
+                        </div>
+                    </div>
+
+                    <div class="aging-card warning clickable-row" onclick="goToLeads('aging-3-7')">
+                        <div class="aging-left">
+                            <div class="aging-dot warning"></div>
+                            <span>3-7 Days</span>
+                        </div>
+                        <div class="aging-right">
+                            <span class="count">25</span>
+                            <span class="status warning-text">Attention • 30%</span>
+                        </div>
+                    </div>
+
+                    <div class="aging-card danger clickable-row" onclick="goToLeads('aging-7+')">
+                        <div class="aging-left">
+                            <div class="aging-dot danger"></div>
+                            <span>7+ Days</span>
+                        </div>
+                        <div class="aging-right">
+                            <span class="count">18</span>
+                            <span class="status danger-text">Critical • 22%</span>
+                        </div>
+                    </div>
+
+                    <!-- 🔥 ALERT -->
+                    <div class="aging-alert">
+                        ⚠️ 18 leads need immediate action
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="section-divider"></div>
+
+        <!-- 🔥 TIMELINE -->
+        <div class="card-clean mt-4">
+            <h5 class="mb-3">Recent Activity</h5>
+
+            <div id="dashboardTimeline">
+                <!-- 🔥 PARTIAL LOAD -->
            
-             document.getElementById("activeLeads").innerText = data.totalActiveLeads;
-            document.getElementById("deadLeads").innerText = data.lostLeads;
+            </div>
+        </div>
 
-        } catch (err) {
-            console.error("Error loading leads count:", err);
-        }
-    }
+    </div>
+</div>
 
+<script src="~/js/index/loadConvertedLead.js"></script>
+<script src="~/js/index/loadLeadCount.js"></script>
+<script src="~/js/index/loadLeedFunnel.js"></script>
+<script src="~/js/index/loadTimeline.js"></script>
+<script src="~/js/index/loadUnassignLead.js"></script>
+<script>
 
-    async function loadUnassignedLeads()
-    {
-        try
-        {
-            const response = await fetch('/api/leadapi/unassigned-leads');
-            const data = await response.json();
-
-            document.getElementById('totalUnassigned').innerText = data.totalUnassigned;
-            document.getElementById('todayUnassigned').innerText = data.today;
-            document.getElementById('oldUnassigned').innerText = data.onePlusDays;
-        }catch(err)
-        {
-            console.log("unassigned Leads Error:",err);
-        }
-    }
-
-        async function loadConvertedLeads() {
-        const res = await fetch('/api/leadapi/converted-leads');
-        const data = await res.json();
-
-        document.getElementById('convertedTotal').innerText = data.total;
-        document.getElementById('convertedToday').innerText = data.today;
-        document.getElementById('convertedWeek').innerText = data.thisWeek;
-        document.getElementById('convertedMonth').innerText = data.thisMonth;
-    }
-
-     async function loadLeadFunnel() {
+        async function loadDashboard() {
         try {
-            const res = await fetch('/api/leadapi/lead-funnel');
-            const data = await res.json();
+            await Promise.all([
+                loadLeadsCount(),
+                loadUnassignedLeads(),
+                loadConvertedLeads(),
+                loadLeadFunnel(),
+                loadTimeline()
+            ]);
 
-            // 🔥 CENTER
-            document.getElementById("totalActive").innerText = data.totalActive;
-
-            document.getElementById("attemptedContact").innerText = data.attemptedContact;
-            document.getElementById("needsFollowUp").innerText = data.needsFollowUp;
-            document.getElementById("callbackScheduled").innerText = data.callbackScheduled;
-            document.getElementById("onHold").innerText = data.onHold;
-            document.getElementById("interested").innerText = data.interested;
-
-            // 🔥 POSITIVE
-            document.getElementById("contacted").innerText = data.contacted;
-            document.getElementById("qualified").innerText = data.qualified;
-            document.getElementById("converted").innerText = data.converted;
-
-            // 🔥 NEGATIVE
-            document.getElementById("noResponse").innerText = data.noResponse;
-            document.getElementById("notInterested").innerText = data.notInterested;
-            document.getElementById("lost").innerText = data.lost;
+            // AFTER ALL DATA LOADED
+            document.getElementById("dashboardSkeleton").style.display = "none";
+            document.getElementById("dashboardContent").style.display = "block";
 
         } catch (err) {
-            console.error("Lead Funnel Load Failed:", err);
+            console.error("Dashboard Load Failed:", err);
         }
     }
 
-    loadLeadsCount();
-    loadUnassignedLeads();
-    loadConvertedLeads();
-    loadLeadFunnel();
-
+    loadDashboard();
 </script>
