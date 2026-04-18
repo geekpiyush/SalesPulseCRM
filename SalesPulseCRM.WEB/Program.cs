@@ -12,14 +12,6 @@ var builder = WebApplication.CreateBuilder(args);
 
 ExcelPackage.License.SetNonCommercialPersonal("Piyush");
 
-builder.Host.ConfigureLogging(logginProvider => { 
-    logginProvider.ClearProviders();
-    logginProvider.AddConsole();
-    logginProvider.AddDebug();
-    logginProvider.AddEventLog();
-
-});
-
 // MVC
 builder.Services.AddControllersWithViews();
 
